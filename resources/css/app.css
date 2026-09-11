@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Gaya khusus Portal Admin Guru — lihat CLAUDE.md §11 */
+@layer components {
+    .kartu {
+        @apply rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200;
+    }
+
+    .kartu-hover:hover {
+        @apply -translate-y-1 shadow-lg;
+    }
+
+    .nilai-merah {
+        @apply bg-red-50 text-red-700 font-semibold;
+    }
+
+    .tombol-sentuh {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
