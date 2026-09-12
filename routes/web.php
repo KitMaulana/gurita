@@ -135,6 +135,9 @@ Route::middleware(['auth', 'tahun.aktif'])->group(function () {
         Route::post('jadwal/reset-slot', [JadwalAdminController::class, 'resetSlotMode'])->name('jadwal.reset-slot');
         Route::resource('jadwal', JadwalAdminController::class)->except(['show']);
 
+        Route::get('pengguna/template-update', [PenggunaController::class, 'templateUpdate'])->name('pengguna.template-update');
+        Route::get('pengguna/ekspor', [PenggunaController::class, 'ekspor'])->name('pengguna.ekspor');
+        Route::post('pengguna/update-massal', [PenggunaController::class, 'updateMassal'])->name('pengguna.update-massal');
         Route::resource('pengguna', PenggunaController::class)->except(['show']);
 
         Route::get('kktp', [KktpController::class, 'index'])->name('kktp.index');

@@ -4,9 +4,22 @@
 @section('konten')
     <x-kepala-halaman judul="Pengguna & Peran">
         <x-slot:aksi>
+            <x-tombol gaya="garis" ikon="arrow-down-tray" :href="route('admin.pengguna.ekspor')">Ekspor CSV</x-tombol>
+            <x-tombol gaya="garis" ikon="arrow-up-tray" @click="$dispatch('buka-modal', 'update-massal-pengguna')">Update Massal</x-tombol>
             <x-tombol gaya="aksen" ikon="plus" :href="route('admin.pengguna.create')">Tambah Pengguna</x-tombol>
         </x-slot:aksi>
     </x-kepala-halaman>
+
+    @if (session('galatImpor'))
+        <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <p class="font-semibold">Catatan update massal:</p>
+            <ul class="mt-1 max-h-56 list-inside list-disc space-y-0.5 overflow-y-auto">
+                @foreach (session('galatImpor') as $pesan)
+                    <li>{{ $pesan }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <form method="GET" class="kartu mb-6 flex flex-wrap items-end gap-3 p-4">
         <x-bidang label="Cari" nama="cari" class="min-w-56 flex-1">
@@ -80,4 +93,51 @@
     </x-tabel>
 
     <div class="mt-4">{{ $daftar->links() }}</div>
+
+    {{-- Modal Update Massal Pengguna --}}
+    <x-modal nama="update-massal-pengguna" judul="Update Massal Email & NIP Pengguna">
+        <form method="POST" action="{{ route('admin.pengguna.update-massal') }}" id="form-update-massal-pengguna"
+              enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <div class="rounded-lg bg-slate-50 p-3 text-sm text-slate-600 space-y-2">
+                <p class="font-semibold text-slate-700">Cara menggunakan fitur ini:</p>
+                <ol class="list-decimal list-inside text-xs text-slate-600 space-y-1">
+                    <li>Klik <strong>Ekspor CSV</strong> untuk mengunduh data pengguna saat ini.</li>
+                    <li>Buka file CSV, lalu isi kolom <code class="font-mono text-primary bg-white px-1 rounded">email_baru</code> dan/atau <code class="font-mono text-primary bg-white px-1 rounded">nip_baru</code> pada baris yang ingin diubah.</li>
+                    <li>Simpan file, lalu unggah kembali di sini.</li>
+                </ol>
+
+                <div class="mt-2 border-t border-slate-200 pt-2">
+                    <p class="font-semibold text-slate-700">Format kolom CSV:</p>
+                    <code class="block text-xs font-mono text-primary font-bold bg-white p-2 rounded border border-slate-200">email_lama, email_baru, nip_baru</code>
+                    <ul class="list-disc list-inside text-xs text-slate-600 space-y-1 mt-2">
+                        <li><strong>email_lama</strong> (wajib): email pengguna yang sudah terdaftar, sebagai kunci pencocokan.</li>
+                        <li><strong>email_baru</strong> (opsional): isi jika ingin mengubah email pengguna.</li>
+                        <li><strong>nip_baru</strong> (opsional): isi jika ingin mengubah NIP pengguna.</li>
+                        <li>Kolom <code class="font-mono text-primary bg-white px-1 rounded">nama</code>, <code class="font-mono text-primary bg-white px-1 rounded">nip_lama</code>, dan <code class="font-mono text-primary bg-white px-1 rounded">peran</code> pada file ekspor hanya sebagai referensi dan akan diabaikan saat proses update.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <x-bidang label="Berkas" nama="berkas" :wajib="true">
+                <input type="file" name="berkas" id="berkas-update-massal" accept=".csv,.xlsx,.xls" required
+                       class="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold">
+            </x-bidang>
+
+            <div class="flex gap-3">
+                <a href="{{ route('admin.pengguna.template-update') }}" class="inline-block text-sm font-semibold text-accent-600 hover:underline">
+                    Unduh template_update_pengguna.csv
+                </a>
+                <span class="text-slate-300">|</span>
+                <a href="{{ route('admin.pengguna.ekspor') }}" class="inline-block text-sm font-semibold text-accent-600 hover:underline">
+                    Ekspor data pengguna saat ini
+                </a>
+            </div>
+        </form>
+
+        <x-slot:kaki>
+            <x-tombol tipe="button" gaya="halus" @click="$dispatch('tutup-modal', 'update-massal-pengguna')">Batal</x-tombol>
+            <x-tombol gaya="aksen" ikon="arrow-up-tray" form="form-update-massal-pengguna">Proses Update</x-tombol>
+        </x-slot:kaki>
+    </x-modal>
 @endsection
