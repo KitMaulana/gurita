@@ -34,14 +34,23 @@
         </div>
     @endif
 
+    {{-- Keterangan Singkatan Kolom Penilaian --}}
+    <div class="mb-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+        <span class="font-bold text-slate-600">Keterangan:</span>
+        <span class="inline-flex items-center gap-1"><strong class="rounded bg-sky-100 px-1.5 py-0.5 font-bold text-sky-800">F</strong> Formatif</span>
+        <span class="inline-flex items-center gap-1"><strong class="rounded bg-emerald-100 px-1.5 py-0.5 font-bold text-emerald-800">SL</strong> Sumatif Lingkup Materi</span>
+        <span class="inline-flex items-center gap-1"><strong class="rounded bg-primary-100 px-1.5 py-0.5 font-bold text-primary-800">SA</strong> Sumatif Akhir Semester</span>
+        <span class="sm:ml-auto italic text-slate-400">*Label "sementara" menandakan komponen nilai belum lengkap seluruhnya.</span>
+    </div>
+
     <x-tabel>
         <x-slot:kepala>
             <tr>
                 <th class="px-3 py-3">No</th>
                 <th class="px-3 py-3">Nama Siswa</th>
-                <th class="px-2 py-3 text-center">F</th>
-                <th class="px-2 py-3 text-center">SL</th>
-                <th class="px-2 py-3 text-center">SA</th>
+                <th class="px-2 py-3 text-center cursor-help" title="Formatif: rata-rata nilai proses / tugas harian">F</th>
+                <th class="px-2 py-3 text-center cursor-help" title="Sumatif Lingkup Materi: rata-rata ulangan per bab">SL</th>
+                <th class="px-2 py-3 text-center cursor-help" title="Sumatif Akhir Semester: nilai ujian akhir">SA</th>
                 <th class="px-3 py-3 text-center">Nilai Akhir</th>
                 <th class="px-2 py-3 text-center">Pred.</th>
                 <th class="px-3 py-3 text-center">Status</th>
