@@ -102,4 +102,13 @@ class User extends Authenticatable
             ->map(fn ($kata) => mb_strtoupper(mb_substr($kata, 0, 1)))
             ->implode('');
     }
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (! $this->foto) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->foto);
+    }
 }

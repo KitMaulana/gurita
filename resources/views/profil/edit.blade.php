@@ -16,8 +16,12 @@
             <div class="space-y-4">
                 <div class="flex items-center gap-4">
                     @if ($pengguna->foto)
-                        <img src="{{ Storage::url($pengguna->foto) }}" alt="Foto profil"
-                             class="h-16 w-16 rounded-full object-cover">
+                        <img src="{{ $pengguna->foto_url ?? Storage::url($pengguna->foto) }}" alt="Foto profil"
+                             class="h-16 w-16 rounded-full object-cover"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-xl font-bold text-primary">
+                            {{ $pengguna->inisial }}
+                        </div>
                     @else
                         <div class="flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-xl font-bold text-primary">
                             {{ $pengguna->inisial }}

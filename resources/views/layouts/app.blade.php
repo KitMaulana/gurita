@@ -144,8 +144,12 @@
         <div class="bg-gradient-to-br from-[#1A365D] to-[#2D4A6F] px-5 py-6 text-white">
             <div class="flex items-center gap-3">
                 @if ($pengguna?->foto)
-                    <img src="{{ Storage::url($pengguna->foto) }}" alt="Foto {{ $pengguna->name }}"
-                         class="h-12 w-12 rounded-full object-cover ring-2 ring-white/40">
+                    <img src="{{ $pengguna->foto_url ?? Storage::url($pengguna->foto) }}" alt="Foto {{ $pengguna->name }}"
+                         class="h-12 w-12 rounded-full object-cover ring-2 ring-white/40"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="hidden h-12 w-12 items-center justify-center rounded-full bg-white/15 text-lg font-bold ring-2 ring-white/30">
+                        {{ $pengguna?->inisial }}
+                    </div>
                 @else
                     <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-lg font-bold ring-2 ring-white/30">
                         {{ $pengguna?->inisial }}

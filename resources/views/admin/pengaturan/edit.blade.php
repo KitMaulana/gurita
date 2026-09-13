@@ -24,7 +24,7 @@
                     <input type="file" name="logo" id="logo" accept="image/*"
                            class="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold">
                     @if ($pengaturan['logo'])
-                        <img src="{{ Storage::url($pengaturan['logo']) }}" alt="Logo sekolah" class="mt-2 h-16">
+                        <img src="{{ asset('storage/' . $pengaturan['logo']) }}" alt="Logo sekolah" class="mt-2 h-16" onerror="this.style.display='none'">
                     @endif
                 </x-bidang>
 

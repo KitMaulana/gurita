@@ -21,8 +21,25 @@ use App\Http\Controllers\Guru\RaporController;
 use App\Http\Controllers\Guru\TujuanPembelajaranController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', fn () => redirect()->route('beranda'));
+
+// Fallback penyajian file publik jika symlink public/storage belum dibuat di hosting (misal cPanel/Hostinger)
+Route::get('/storage/{path}', function (string $path) {
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+
+    $disk = Storage::disk('public');
+    if (! $disk->exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($disk->path($path), [
+        'Cache-Control' => 'public, max-age=86400',
+    ]);
+})->where('path', '.*')->name('storage.fallback');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
