@@ -50,7 +50,10 @@ class PenilaianController extends Controller
     public function store(PenilaianRequest $request): RedirectResponse
     {
         $penilaian = DB::transaction(function () use ($request) {
-            $penilaian = Penilaian::create($request->validated());
+            $data = $request->validated();
+            $data['bobot'] = ($data['bobot'] !== null && $data['bobot'] !== '') ? $data['bobot'] : 0;
+
+            $penilaian = Penilaian::create($data);
             $this->siapkanBarisNilai($penilaian);
 
             return $penilaian;
@@ -73,7 +76,10 @@ class PenilaianController extends Controller
 
     public function update(PenilaianRequest $request, Penilaian $penilaian): RedirectResponse
     {
-        $penilaian->update($request->validated());
+        $data = $request->validated();
+        $data['bobot'] = ($data['bobot'] !== null && $data['bobot'] !== '') ? $data['bobot'] : 0;
+
+        $penilaian->update($data);
         $this->siapkanBarisNilai($penilaian);
 
         return redirect()->route('penilaian.index')->with('sukses', 'Penilaian berhasil diperbarui.');

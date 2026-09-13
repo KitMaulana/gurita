@@ -209,36 +209,46 @@ document.addEventListener('alpine:init', () => {
         </x-slot:aksi>
     </x-kepala-halaman>
 
-    {{-- Tab Navigasi --}}
-    <div class="mb-6 flex border-b border-slate-200" x-data="{ tab: '{{ $tabAktif }}' }">
-        <button type="button" @click="tab = 'input'"
-                class="flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-bold transition"
-                :class="tab === 'input'
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'">
-            <x-heroicon-o-pencil-square class="h-4 w-4"/>
-            <span>Input Presensi Langsung</span>
-            @if ($sesiMapel->isNotEmpty())
-                <span class="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-                    {{ $sesiMapel->count() }} Sesi
+    {{-- Container Utama Tab Presensi --}}
+    <div x-data="{
+        tab: '{{ $tabAktif }}',
+        pilihTab(t) {
+            this.tab = t;
+            const u = new URL(window.location.href);
+            u.searchParams.set('tab', t);
+            window.history.replaceState({}, '', u.toString());
+        }
+    }">
+        {{-- Tab Navigasi --}}
+        <div class="mb-6 flex border-b border-slate-200">
+            <button type="button" @click="pilihTab('input')"
+                    class="flex cursor-pointer items-center gap-2 border-b-2 px-5 py-3 text-sm font-bold transition"
+                    :class="tab === 'input'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'">
+                <x-heroicon-o-pencil-square class="h-4 w-4"/>
+                <span>Input Presensi Langsung</span>
+                @if ($sesiMapel->isNotEmpty())
+                    <span class="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                        {{ $sesiMapel->count() }} Sesi
+                    </span>
+                @endif
+            </button>
+            <button type="button" @click="pilihTab('riwayat')"
+                    class="flex cursor-pointer items-center gap-2 border-b-2 px-5 py-3 text-sm font-bold transition"
+                    :class="tab === 'riwayat'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'">
+                <x-heroicon-o-clock class="h-4 w-4"/>
+                <span>Riwayat Pertemuan</span>
+                <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                    {{ $daftar->total() }}
                 </span>
-            @endif
-        </button>
-        <button type="button" @click="tab = 'riwayat'"
-                class="flex items-center gap-2 border-b-2 px-5 py-3 text-sm font-bold transition"
-                :class="tab === 'riwayat'
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'">
-            <x-heroicon-o-clock class="h-4 w-4"/>
-            <span>Riwayat Pertemuan</span>
-            <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
-                {{ $daftar->total() }}
-            </span>
-        </button>
-    </div>
+            </button>
+        </div>
 
-    {{-- TAB 1: INPUT PRESENSI LANGSUNG (ALA ABSENSI-SISWA) --}}
-    <div x-data="{ tab: '{{ $tabAktif }}' }" x-show="tab === 'input'" class="space-y-6">
+        {{-- TAB 1: INPUT PRESENSI LANGSUNG (ALA ABSENSI-SISWA) --}}
+        <div x-show="tab === 'input'" x-cloak class="space-y-6">
         {{-- Card Filter Tanggal & Pilihan Kelas --}}
         <div class="kartu p-4 sm:p-5">
             <form method="GET" action="{{ route('presensi.index') }}" id="formTanggal"
@@ -590,7 +600,7 @@ document.addEventListener('alpine:init', () => {
     </div>
 
     {{-- TAB 2: RIWAYAT PERTEMUAN & REKAP --}}
-    <div x-data="{ tab: '{{ $tabAktif }}' }" x-show="tab === 'riwayat'" class="space-y-4">
+    <div x-show="tab === 'riwayat'" x-cloak class="space-y-4">
         <form method="GET" action="{{ route('presensi.index') }}" class="kartu tanpa-cetak grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
             <input type="hidden" name="tab" value="riwayat">
             <x-bidang label="Kelas" nama="filter_kelas_id">
@@ -658,6 +668,7 @@ document.addEventListener('alpine:init', () => {
 
         <div class="mt-4">{{ $daftar->links() }}</div>
     </div>
+</div>
 @endsection
 
 @push('skrip')

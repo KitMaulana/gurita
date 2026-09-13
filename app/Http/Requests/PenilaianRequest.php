@@ -24,6 +24,7 @@ class PenilaianRequest extends FormRequest
             'tahun_ajaran_id' => TahunAjaran::aktif()?->id,
             'guru_id' => $this->user()->id,
             'is_remedial' => $this->boolean('is_remedial'),
+            'bobot' => ($this->filled('bobot') && is_numeric($this->input('bobot'))) ? $this->input('bobot') : 0,
         ]);
     }
 

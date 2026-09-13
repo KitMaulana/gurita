@@ -34,6 +34,11 @@ class Penilaian extends Model
         ];
     }
 
+    public function setBobotAttribute($value): void
+    {
+        $this->attributes['bobot'] = ($value !== null && $value !== '') ? $value : 0;
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
