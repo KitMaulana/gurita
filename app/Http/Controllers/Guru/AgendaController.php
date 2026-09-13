@@ -11,6 +11,7 @@ use App\Models\Agenda;
 use App\Models\Bab;
 use App\Models\Jadwal;
 use App\Models\Pengaturan;
+use App\Support\SesiJadwal;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -51,18 +52,14 @@ class AgendaController extends Controller
                 ->get()
             : collect();
 
-        $agendaAda = Agenda::query()
-            ->whereIn('jadwal_id', $jadwals->pluck('id'))
-            ->whereDate('tanggal', $tanggal)
-            ->get()
-            ->keyBy('jadwal_id');
+        $sesiList = SesiJadwal::dariJadwalHarian($jadwals, $tanggal);
 
         return view('agenda.dari-jadwal', [
             'tanggal' => Carbon::parse($tanggal),
             'hari' => $hari,
             'jadwals' => $jadwals,
-            'agendaAda' => $agendaAda,
-            'babList' => $this->babUntukJadwal($jadwals),
+            'sesiList' => $sesiList,
+            'babList' => $this->babUntukSesi($sesiList),
             'statusList' => StatusAgenda::pilihan(),
         ]);
     }
@@ -80,15 +77,16 @@ class AgendaController extends Controller
             'agenda.*.uraian_kegiatan' => ['nullable', 'string', 'max:2000'],
             'agenda.*.metode' => ['nullable', 'string', 'max:255'],
         ], [
-            'pilih.required' => 'Pilih minimal satu jadwal yang akan dibuatkan agenda.',
+            'pilih.required' => 'Pilih minimal satu sesi jadwal yang akan dibuatkan agenda.',
             'agenda.*.judul_materi.required' => 'Judul materi wajib diisi untuk jadwal yang dicentang.',
         ]);
 
         $tanggal = Carbon::parse($data['tanggal']);
         $terakhirDibuat = null;
         $jumlah = 0;
+        $totalJpTersimpan = 0;
 
-        DB::transaction(function () use ($data, $tanggal, $request, &$jumlah, &$terakhirDibuat) {
+        DB::transaction(function () use ($data, $tanggal, $request, &$jumlah, &$totalJpTersimpan, &$terakhirDibuat) {
             foreach ($data['pilih'] as $jadwalId) {
                 $jadwal = Jadwal::findOrFail($jadwalId);
                 $this->authorize('isiAgenda', $jadwal);
@@ -99,23 +97,50 @@ class AgendaController extends Controller
                     continue;
                 }
 
-                // pertemuan_ke = urutan agenda pada jadwal tersebut
-                $pertemuanKe = Agenda::where('jadwal_id', $jadwal->id)
+                // Cari sesi jadwal yang memuat jadwal ini
+                $sesi = SesiJadwal::cariSesiUntukJadwal($jadwal);
+                $scheduleIds = $sesi ? $sesi->schedule_ids : [$jadwal->id];
+                $primaryId = $sesi ? $sesi->primary_schedule_id : $jadwal->id;
+                $totalJpTersimpan += $sesi ? $sesi->total_jp : 1;
+
+                // pertemuan_ke = urutan agenda pada jadwal/sesi tersebut
+                $pertemuanKe = Agenda::whereIn('jadwal_id', $scheduleIds)
                     ->whereDate('tanggal', '<=', $tanggal)
                     ->where('tanggal', '!=', $tanggal->toDateString())
                     ->count() + 1;
 
-                $agenda = Agenda::updateOrCreate(
-                    ['jadwal_id' => $jadwal->id, 'tanggal' => $tanggal->toDateString()],
-                    [
-                        'pertemuan_ke' => $pertemuanKe,
-                        'judul_materi' => $isian['judul_materi'],
-                        'uraian_kegiatan' => $isian['uraian_kegiatan'] ?? null,
-                        'metode' => $isian['metode'] ?? null,
-                        'bab_id' => $isian['bab_id'] ?? null,
-                        'status' => $isian['status'],
-                    ]
-                );
+                // Cari apakah agenda sudah ada pada salah satu jadwal di sesi ini
+                $agenda = Agenda::whereIn('jadwal_id', $scheduleIds)
+                    ->whereDate('tanggal', $tanggal->toDateString())
+                    ->first();
+
+                $payload = [
+                    'jadwal_id' => $primaryId,
+                    'tanggal' => $tanggal->toDateString(),
+                    'pertemuan_ke' => $pertemuanKe,
+                    'judul_materi' => $isian['judul_materi'],
+                    'uraian_kegiatan' => $isian['uraian_kegiatan'] ?? null,
+                    'metode' => $isian['metode'] ?? null,
+                    'bab_id' => $isian['bab_id'] ?? null,
+                    'status' => $isian['status'],
+                ];
+
+                if ($agenda) {
+                    $agenda->update($payload);
+
+                    // Bersihkan agenda duplikat lain dalam sesi yang sama jika ada sisa input per-JP lama
+                    $duplikatLain = Agenda::whereIn('jadwal_id', $scheduleIds)
+                        ->whereDate('tanggal', $tanggal->toDateString())
+                        ->where('id', '!=', $agenda->id)
+                        ->get();
+
+                    foreach ($duplikatLain as $dup) {
+                        $dup->presensis()->update(['agenda_id' => $agenda->id]);
+                        $dup->delete();
+                    }
+                } else {
+                    $agenda = Agenda::create($payload);
+                }
 
                 $terakhirDibuat = $agenda;
                 $jumlah++;
@@ -127,11 +152,11 @@ class AgendaController extends Controller
         // Setelah agenda tersimpan → langsung ke pengisian presensi (§7.3).
         if ($jumlah === 1 && $terakhirDibuat && $terakhirDibuat->status->perluPresensi()) {
             return redirect()->route('presensi.isi', $terakhirDibuat)
-                ->with('sukses', 'Agenda tersimpan. Lanjutkan mengisi presensi.');
+                ->with('sukses', "Agenda ({$totalJpTersimpan} JP) tersimpan. Lanjutkan mengisi presensi.");
         }
 
         return redirect()->route('agenda.index')
-            ->with('sukses', $jumlah.' agenda berhasil disimpan.');
+            ->with('sukses', "{$jumlah} agenda ({$totalJpTersimpan} JP) berhasil disimpan.");
     }
 
     public function edit(Agenda $agenda): View
@@ -223,6 +248,28 @@ class AgendaController extends Controller
         ];
     }
 
+    /** Saran bab per sesi untuk autocomplete judul materi. */
+    protected function babUntukSesi($sesiList): array
+    {
+        $saran = [];
+
+        foreach ($sesiList as $sesi) {
+            $primaryId = $sesi->primary_schedule_id ?? ($sesi->id ?? null);
+            if (! $primaryId) {
+                continue;
+            }
+
+            $saran[$primaryId] = Bab::query()
+                ->where('mata_pelajaran_id', $sesi->mata_pelajaran_id)
+                ->when($sesi->kelas?->tingkat, fn ($q, $tingkat) => $q->where('tingkat', $tingkat))
+                ->with('tujuanPembelajarans')
+                ->orderBy('urutan')
+                ->get();
+        }
+
+        return $saran;
+    }
+
     /** Saran bab per jadwal untuk autocomplete judul materi. */
     protected function babUntukJadwal($jadwals): array
     {
@@ -240,3 +287,4 @@ class AgendaController extends Controller
         return $saran;
     }
 }
+

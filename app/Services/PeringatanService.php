@@ -7,6 +7,7 @@ use App\Models\Agenda;
 use App\Models\Jadwal;
 use App\Models\Penilaian;
 use App\Models\User;
+use App\Support\SesiJadwal;
 use Illuminate\Support\Collection;
 
 /**
@@ -57,18 +58,33 @@ class PeringatanService
                 continue;
             }
 
-            foreach ($jadwals->where('hari', $hari) as $jadwal) {
-                if ($agendaAda->has($jadwal->id.'|'.$tanggal->toDateString())) {
+            $jadwalsHari = $jadwals->where('hari', $hari);
+            if ($jadwalsHari->isEmpty()) {
+                continue;
+            }
+
+            $sesiList = SesiJadwal::dariJadwalHarian($jadwalsHari);
+
+            foreach ($sesiList as $sesi) {
+                $sudahAda = false;
+                foreach ($sesi->schedule_ids as $sid) {
+                    if ($agendaAda->has($sid.'|'.$tanggal->toDateString())) {
+                        $sudahAda = true;
+                        break;
+                    }
+                }
+
+                if ($sudahAda) {
                     continue;
                 }
 
-                $namaKelas = $jadwal->kelas?->nama ?? $jadwal->kelas_tampilan;
-                $mapel = $jadwal->mataPelajaran?->singkatan ?? $jadwal->mataPelajaran?->nama ?? ($jadwal->title ?: 'Pelajaran');
+                $namaKelas = $sesi->kelas_tampilan;
+                $mapel = $sesi->nama_tampilan;
+                $labelJp = $sesi->label_jp_singkat;
 
                 $peringatan->push([
                     'tipe' => 'agenda',
-                    'pesan' => 'Agenda '.$namaKelas.' ('.$mapel.') '
-                        .$tanggal->format('d/m/Y').' belum diisi.',
+                    'pesan' => "Agenda {$namaKelas} ({$mapel}) {$labelJp} ".$tanggal->format('d/m/Y').' belum diisi.',
                     'url' => route('agenda.dari-jadwal', ['tanggal' => $tanggal->toDateString()]),
                 ]);
             }

@@ -5,7 +5,7 @@
 
 @section('konten')
     <x-kepala-halaman judul="Buat Agenda dari Jadwal"
-                      keterangan="Pilih tanggal, centang jadwal yang terlaksana, lalu isi materinya sekaligus.">
+                      keterangan="Pilih tanggal, centang jadwal kelas yang terlaksana, lalu isi materinya sekaligus.">
         <x-slot:aksi>
             <x-tombol gaya="halus" ikon="arrow-left" :href="route('agenda.index')">Kembali</x-tombol>
         </x-slot:aksi>
@@ -25,7 +25,7 @@
             <p class="mt-3 font-semibold text-slate-700">Tanggal yang dipilih jatuh pada hari Minggu</p>
             <p class="text-sm text-slate-500">Tidak ada jadwal mengajar pada hari Minggu.</p>
         </div>
-    @elseif ($jadwals->isEmpty())
+    @elseif ($sesiList->isEmpty())
         <div class="kartu p-10 text-center">
             <x-heroicon-o-calendar-days class="mx-auto h-12 w-12 text-slate-300"/>
             <p class="mt-3 font-semibold text-slate-700">Tidak ada jadwal pada hari {{ $hari->label() }}</p>
@@ -41,17 +41,17 @@
                     <input type="checkbox" x-model="semua"
                            @change="$root.querySelectorAll('input[name=\'pilih[]\']:not(:disabled)').forEach(c => c.checked = semua)"
                            class="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent">
-                    Centang semua jadwal
+                    Centang semua sesi
                 </label>
-                <span class="text-sm text-slate-500">{{ $jadwals->count() }} jadwal pada {{ $hari->label() }}</span>
+                <span class="text-sm text-slate-500">{{ $sesiList->count() }} sesi ({{ $jadwals->count() }} JP) pada {{ $hari->label() }}</span>
             </div>
 
-            <div class="space-y-3">
-                @foreach ($jadwals as $jadwal)
+            <div class="space-y-4">
+                @foreach ($sesiList as $sesi)
                     @php
-                        $sudah = $agendaAda->get($jadwal->id);
-                        $babs = $babList[$jadwal->id] ?? collect();
-                        $warna = \App\Support\WarnaMapel::untuk($jadwal->nama_tampilan, $jadwal->isAgendaBersama());
+                        $sudah = $sesi->agenda;
+                        $babs = $babList[$sesi->primary_schedule_id] ?? collect();
+                        $warna = $sesi->warna_mapel;
                     @endphp
 
                     <div @class([
@@ -60,26 +60,26 @@
                     ]) style="border-left: 5px solid {{ $warna['accent'] }};">
                         <div class="flex flex-wrap items-start gap-3">
                             <label class="flex cursor-pointer items-center pt-1">
-                                <input type="checkbox" name="pilih[]" value="{{ $jadwal->id }}"
-                                       @checked(old('pilih') && in_array($jadwal->id, (array) old('pilih')))
+                                <input type="checkbox" name="pilih[]" value="{{ $sesi->primary_schedule_id }}"
+                                       @checked(old('pilih') && in_array($sesi->primary_schedule_id, (array) old('pilih')))
                                        class="h-5 w-5 rounded border-slate-300 text-accent focus:ring-accent">
                             </label>
 
                             <div class="min-w-0 flex-1">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="inline-flex items-center justify-center rounded px-2 py-0.5 text-xs font-black shadow-2xs"
+                                    <span class="inline-flex items-center justify-center rounded px-2.5 py-1 text-xs font-black shadow-2xs"
                                           style="background-color: {{ $warna['jp_bg'] }}; color: {{ $warna['jp_text'] }};">
-                                        JP {{ $jadwal->jam_ke }}
+                                        {{ $sesi->label_jp }}
                                     </span>
-                                    <span class="font-extrabold text-slate-900">{{ $jadwal->kelas_tampilan }}</span>
+                                    <span class="font-extrabold text-slate-900 text-base">{{ $sesi->kelas_tampilan }}</span>
                                     <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
                                           style="background-color: {{ $warna['badge_bg'] }}; color: {{ $warna['badge_text'] }}; border: 1px solid {{ $warna['border'] }};">
                                         <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background-color: {{ $warna['dot'] }};"></span>
-                                        <span>{{ $jadwal->nama_tampilan }}</span>
+                                        <span>{{ $sesi->nama_tampilan }}</span>
                                     </span>
                                 </div>
-                                <p class="text-xs text-slate-500">
-                                    {{ $jadwal->jam }} @if ($jadwal->ruang) · {{ $jadwal->ruang }} @endif
+                                <p class="text-xs text-slate-500 mt-1">
+                                    {{ $sesi->jam }} @if ($sesi->ruang) · Ruang {{ $sesi->ruang }} @endif
                                     @if ($sudah)
                                         <span class="ml-1 font-semibold text-emerald-700">
                                             (Agenda sudah ada — pertemuan ke-{{ $sudah->pertemuan_ke }}, akan diperbarui)
@@ -88,13 +88,13 @@
                                 </p>
 
                                 <div class="mt-3 grid gap-3 md:grid-cols-2">
-                                    <x-bidang label="Judul Materi" :nama="'agenda.'.$jadwal->id.'.judul_materi'" :wajib="true">
-                                        <input type="text" name="agenda[{{ $jadwal->id }}][judul_materi]"
-                                               list="bab-{{ $jadwal->id }}"
-                                               value="{{ old('agenda.'.$jadwal->id.'.judul_materi', $sudah?->judul_materi) }}"
+                                    <x-bidang label="Judul Materi" :nama="'agenda.'.$sesi->primary_schedule_id.'.judul_materi'" :wajib="true">
+                                        <input type="text" name="agenda[{{ $sesi->primary_schedule_id }}][judul_materi]"
+                                               list="bab-{{ $sesi->primary_schedule_id }}"
+                                               value="{{ old('agenda.'.$sesi->primary_schedule_id.'.judul_materi', $sudah?->judul_materi) }}"
                                                placeholder="mis. Menulis Teks Editorial"
                                                class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
-                                        <datalist id="bab-{{ $jadwal->id }}">
+                                        <datalist id="bab-{{ $sesi->primary_schedule_id }}">
                                             @foreach ($babs as $bab)
                                                 <option value="{{ $bab->judul }}"></option>
                                                 @foreach ($bab->tujuanPembelajarans as $tp)
@@ -104,39 +104,39 @@
                                         </datalist>
                                     </x-bidang>
 
-                                    <x-bidang label="Bab / Lingkup Materi" :nama="'agenda.'.$jadwal->id.'.bab_id'">
-                                        <select name="agenda[{{ $jadwal->id }}][bab_id]"
+                                    <x-bidang label="Bab / Lingkup Materi" :nama="'agenda.'.$sesi->primary_schedule_id.'.bab_id'">
+                                        <select name="agenda[{{ $sesi->primary_schedule_id }}][bab_id]"
                                                 class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
                                             <option value="">— Tidak ditautkan —</option>
                                             @foreach ($babs as $bab)
-                                                <option value="{{ $bab->id }}" @selected($sudah?->bab_id === $bab->id)>
+                                                <option value="{{ $bab->id }}" @selected(($sudah?->bab_id ?? old('agenda.'.$sesi->primary_schedule_id.'.bab_id')) === $bab->id)>
                                                     {{ $bab->kode }} — {{ $bab->judul }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </x-bidang>
 
-                                    <x-bidang label="Metode" :nama="'agenda.'.$jadwal->id.'.metode'">
-                                        <input type="text" name="agenda[{{ $jadwal->id }}][metode]"
-                                               value="{{ old('agenda.'.$jadwal->id.'.metode', $sudah?->metode) }}"
+                                    <x-bidang label="Metode" :nama="'agenda.'.$sesi->primary_schedule_id.'.metode'">
+                                        <input type="text" name="agenda[{{ $sesi->primary_schedule_id }}][metode]"
+                                               value="{{ old('agenda.'.$sesi->primary_schedule_id.'.metode', $sudah?->metode) }}"
                                                placeholder="mis. Diskusi kelompok"
                                                class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
                                     </x-bidang>
 
-                                    <x-bidang label="Status Pertemuan" :nama="'agenda.'.$jadwal->id.'.status'" :wajib="true">
-                                        <select name="agenda[{{ $jadwal->id }}][status]"
+                                    <x-bidang label="Status Pertemuan" :nama="'agenda.'.$sesi->primary_schedule_id.'.status'" :wajib="true">
+                                        <select name="agenda[{{ $sesi->primary_schedule_id }}][status]"
                                                 class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
                                             @foreach ($statusList as $nilai => $label)
                                                 <option value="{{ $nilai }}"
-                                                    @selected(($sudah?->status?->value ?? 'terlaksana') === $nilai)>{{ $label }}</option>
+                                                    @selected(($sudah?->status?->value ?? old('agenda.'.$sesi->primary_schedule_id.'.status', 'terlaksana')) === $nilai)>{{ $label }}</option>
                                             @endforeach
                                         </select>
                                     </x-bidang>
 
-                                    <x-bidang label="Uraian Kegiatan" :nama="'agenda.'.$jadwal->id.'.uraian_kegiatan'" class="md:col-span-2">
-                                        <textarea name="agenda[{{ $jadwal->id }}][uraian_kegiatan]" rows="2"
+                                    <x-bidang label="Uraian Kegiatan" :nama="'agenda.'.$sesi->primary_schedule_id.'.uraian_kegiatan'" class="md:col-span-2">
+                                        <textarea name="agenda[{{ $sesi->primary_schedule_id }}][uraian_kegiatan]" rows="2"
                                                   placeholder="Ringkasan kegiatan pembelajaran"
-                                                  class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">{{ old('agenda.'.$jadwal->id.'.uraian_kegiatan', $sudah?->uraian_kegiatan) }}</textarea>
+                                                  class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">{{ old('agenda.'.$sesi->primary_schedule_id.'.uraian_kegiatan', $sudah?->uraian_kegiatan) }}</textarea>
                                     </x-bidang>
                                 </div>
                             </div>

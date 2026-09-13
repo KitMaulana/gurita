@@ -5,7 +5,7 @@
 
 @section('konten')
     <x-kepala-halaman judul="Ubah Agenda Mengajar"
-                      :keterangan="($agenda->jadwal?->kelas_tampilan ?? '—').' — '.($agenda->jadwal?->nama_tampilan ?? '—').' · '.Tanggal::lengkap($agenda->tanggal)">
+                      :keterangan="($agenda->jadwal?->kelas_tampilan ?? '—').' — '.($agenda->jadwal?->nama_tampilan ?? '—').' ('.$agenda->label_jp.') · '.Tanggal::lengkap($agenda->tanggal)">
         <x-slot:aksi>
             <x-tombol gaya="halus" ikon="arrow-left" :href="route('agenda.index')">Kembali</x-tombol>
         </x-slot:aksi>

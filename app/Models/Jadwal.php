@@ -158,4 +158,29 @@ class Jadwal extends Model
 
         return $jam >= $mulai && $jam <= $selesai;
     }
+
+    /** Mendapatkan objek SesiJadwal untuk jadwal ini. */
+    public function getSesiAttribute(): ?object
+    {
+        return \App\Support\SesiJadwal::cariSesiUntukJadwal($this);
+    }
+
+    /** Label JP untuk blok sesi jadwal ini, misal: "JP 1–3" atau "JP 1". */
+    public function getLabelBlokJpAttribute(): string
+    {
+        return $this->sesi?->label_jp_singkat ?? "JP {$this->jam_ke}";
+    }
+
+    /** Rentang angka JP untuk blok sesi jadwal ini, misal: "1–3" atau "1". */
+    public function getRentangJpAttribute(): string
+    {
+        return $this->sesi?->rentang_jam_ke ?? (string) $this->jam_ke;
+    }
+
+    /** Rentang jam mengajar lengkap untuk sesi jadwal ini. */
+    public function getJamSesiAttribute(): string
+    {
+        return $this->sesi?->jam ?? $this->jam;
+    }
 }
+

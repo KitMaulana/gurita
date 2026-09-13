@@ -8,6 +8,7 @@ use App\Models\Jadwal;
 use App\Models\Materi;
 use App\Services\PeringatanService;
 use App\Services\RekapPresensiService;
+use App\Support\SesiJadwal;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -33,12 +34,17 @@ class BerandaController extends Controller
             ? $jadwals->where('hari', $hariIni)->sortBy('jam_ke')->values()
             : collect();
 
-        // Agenda yang sudah dibuat hari ini, untuk menandai jadwal yang sudah diisi.
-        $agendaHariIni = Agenda::query()
-            ->whereIn('jadwal_id', $jadwalHariIni->pluck('id'))
-            ->whereDate('tanggal', today())
-            ->get()
-            ->keyBy('jadwal_id');
+        // Ambil sesi jadwal hari ini dan petakan agendanya ke seluruh jadwal dalam sesi tersebut
+        $sesiHariIni = SesiJadwal::dariJadwalHarian($jadwalHariIni, today());
+        $agendaHariIni = collect();
+
+        foreach ($sesiHariIni as $sesi) {
+            if ($sesi->agenda) {
+                foreach ($sesi->schedule_ids as $sid) {
+                    $agendaHariIni->put($sid, $sesi->agenda);
+                }
+            }
+        }
 
         $idKelas = $jadwals->pluck('kelas_id')->filter()->unique();
 

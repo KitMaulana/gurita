@@ -53,7 +53,7 @@
                 </td>
                 <td class="px-4 py-3">
                     <p class="font-medium text-slate-800">{{ $agenda->jadwal?->kelas_tampilan ?? '—' }}</p>
-                    <p class="text-xs text-slate-500">{{ $agenda->jadwal?->nama_tampilan ?? '—' }} · JP {{ $agenda->jadwal?->jam_ke ?? '—' }}</p>
+                    <p class="text-xs text-slate-500">{{ $agenda->jadwal?->nama_tampilan ?? '—' }} · {{ $agenda->label_jp }}</p>
                 </td>
                 <td class="px-4 py-3 text-slate-600">{{ $agenda->pertemuan_ke }}</td>
                 <td class="px-4 py-3">

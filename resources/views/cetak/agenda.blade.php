@@ -39,7 +39,7 @@
                 <td style="text-align:center;">{{ $i + 1 }}</td>
                 <td>{{ Tanggal::angka($agenda->tanggal) }}</td>
                 <td>{{ $agenda->jadwal?->kelas_tampilan ?? '—' }}</td>
-                <td style="text-align:center;">{{ $agenda->jadwal?->jam_ke ?? '—' }}</td>
+                <td style="text-align:center;">{{ $agenda->rentang_jp }}</td>
                 <td style="text-align:center;">{{ $agenda->pertemuan_ke }}</td>
                 <td>{{ $agenda->judul_materi }}</td>
                 <td>{{ $agenda->uraian_kegiatan ?? '—' }}</td>

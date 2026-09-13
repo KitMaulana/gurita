@@ -37,7 +37,7 @@ class AgendaExport implements FromCollection, ShouldAutoSize, WithHeadings, With
             Tanggal::namaHari($agenda->tanggal),
             $agenda->jadwal?->kelas?->nama ?? $agenda->jadwal?->kelas_tampilan ?? '—',
             $agenda->jadwal?->mataPelajaran?->nama ?? ($agenda->jadwal?->title ?: '—'),
-            $agenda->jadwal?->jam_ke ?? '—',
+            $agenda->rentang_jp ?? (string) ($agenda->jadwal?->jam_ke ?? '—'),
             $agenda->pertemuan_ke,
             $agenda->judul_materi,
             $agenda->bab?->kode,

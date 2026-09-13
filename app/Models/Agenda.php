@@ -77,4 +77,17 @@ class Agenda extends Model
     {
         return $this->presensis()->exists();
     }
+
+    /** Label JP untuk agenda ini, misal: "JP 1–3" atau "JP 1". */
+    public function getLabelJpAttribute(): string
+    {
+        return $this->jadwal?->label_blok_jp ?? '—';
+    }
+
+    /** Rentang angka JP untuk agenda ini, misal: "1–3" atau "1". */
+    public function getRentangJpAttribute(): string
+    {
+        return $this->jadwal?->rentang_jp ?? (string) ($this->jadwal?->jam_ke ?? '—');
+    }
 }
+
