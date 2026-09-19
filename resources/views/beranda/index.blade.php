@@ -99,7 +99,7 @@
                                     <x-tombol gaya="aksen" :href="route('presensi.index', ['tanggal' => today()->toDateString(), 'jadwal_id' => $jadwal->id])" ikon="check-circle">
                                         Isi Presensi
                                     </x-tombol>
-                                    <x-tombol gaya="garis" :href="route('agenda.dari-jadwal', ['tanggal' => today()->toDateString()])" ikon="plus" title="Isi Agenda Mengajar">
+                                    <x-tombol gaya="garis" :href="route('agenda.dari-jadwal', ['tanggal' => today()->toDateString(), 'jadwal_id' => $jadwal->id])" ikon="plus" title="Isi Agenda Mengajar">
                                         Agenda
                                     </x-tombol>
                                 </div>
