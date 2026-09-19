@@ -81,70 +81,91 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($sesiList as $sesi)
                     @php
                         $isAktif = $sesiAktif && $sesiAktif->id === $sesi->id;
-                        $warna = $sesi->warna_mapel;
+                        $warnaK = $sesi->warna_kelas;
+                        $warnaM = $sesi->warna_mapel;
                         $sudah = $sesi->agenda;
                     @endphp
 
                     <a href="{{ route('agenda.dari-jadwal', ['tanggal' => $tanggal->toDateString(), 'jadwal_id' => $sesi->primary_schedule_id]) }}"
                        @class([
-                           'group block rounded-2xl border p-4 transition-all',
-                           'border-primary bg-primary-50/30 ring-2 ring-primary shadow-sm' => $isAktif,
-                           'border-slate-200 bg-white hover:border-slate-300 hover:shadow-xs' => ! $isAktif,
+                           'group relative block rounded-2xl p-4 sm:p-5 transition-all duration-200',
+                           'shadow-md scale-[1.02] ring-2' => $isAktif,
+                           'hover:shadow-md hover:scale-[1.01] hover:brightness-[0.98]' => ! $isAktif,
                        ])
-                       style="border-left: 5px solid {{ $warna['accent'] }};">
+                       style="
+                           background-color: {{ $warnaK['bg_card'] }};
+                           border: 1.5px solid {{ $isAktif ? $warnaK['accent'] : $warnaK['border'] }};
+                           border-left: 6px solid {{ $warnaK['accent'] }};
+                           @if ($isAktif) --tw-ring-color: {{ $warnaK['accent'] }}; @endif
+                       ">
+                        {{-- Baris Atas: JP, Kelas, Penanda Berlangsung --}}
                         <div class="flex items-start justify-between gap-2">
-                            <div class="flex flex-wrap items-center gap-1.5">
-                                <span class="inline-flex items-center justify-center rounded px-2.5 py-0.5 text-xs font-black shadow-2xs"
-                                      style="background-color: {{ $warna['jp_bg'] }}; color: {{ $warna['jp_text'] }};">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="inline-flex items-center justify-center rounded-xl px-2.5 py-1 text-xs font-black shadow-xs"
+                                      style="background-color: {{ $warnaK['jp_bg'] }}; color: {{ $warnaK['jp_text'] }};">
                                     {{ $sesi->label_jp }}
                                 </span>
-                                <span class="font-black text-slate-900 text-base tracking-tight">{{ $sesi->kelas_tampilan }}</span>
+                                <span class="inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-base font-black tracking-tight shadow-2xs"
+                                      style="background-color: {{ $warnaK['badge_bg'] }}; color: {{ $warnaK['badge_text'] }}; border: 1.5px solid {{ $warnaK['border'] }};">
+                                    <span class="h-2 w-2 rounded-full shrink-0 shadow-xs" style="background-color: {{ $warnaK['accent'] }};"></span>
+                                    <strong>{{ $sesi->kelas_tampilan }}</strong>
+                                </span>
                             </div>
 
                             @if ($sesi->first_schedule->sedangBerlangsung())
-                                <span class="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-xs animate-pulse"
+                                      style="background-color: {{ $warnaK['accent'] }};">
                                     BERLANGSUNG
                                 </span>
                             @endif
                         </div>
 
-                        <div class="mt-2">
-                            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                                  style="background-color: {{ $warna['badge_bg'] }}; color: {{ $warna['badge_text'] }}; border: 1px solid {{ $warna['border'] }};">
-                                <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background-color: {{ $warna['dot'] }};"></span>
+                        {{-- Baris Tengah: Mapel & Jam --}}
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold shadow-2xs bg-white/95 border border-slate-200/80 text-slate-800">
+                                <span class="h-2 w-2 rounded-full shrink-0 shadow-xs" style="background-color: {{ $warnaM['dot'] }};"></span>
                                 <span class="truncate max-w-[200px]">{{ $sesi->nama_tampilan }}</span>
                             </span>
                         </div>
 
-                        <p class="mt-2 text-xs font-medium text-slate-500">
-                            {{ $sesi->jam }} @if ($sesi->ruang) · Ruang {{ $sesi->ruang }} @endif
+                        <p class="mt-2 text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                            <x-heroicon-o-clock class="h-3.5 w-3.5 text-slate-500 shrink-0"/>
+                            <span>{{ $sesi->jam }} WIB</span>
+                            @if ($sesi->ruang)
+                                <span class="text-slate-400">·</span>
+                                <span class="font-bold text-slate-700">Ruang {{ $sesi->ruang }}</span>
+                            @endif
                         </p>
 
-                        <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5 text-xs">
+                        {{-- Baris Bawah: Status Agenda & Indikator Aksi --}}
+                        <div class="mt-4 flex items-center justify-between border-t pt-3 text-xs"
+                             style="border-color: {{ $warnaK['border'] }};">
                             @if ($sudah)
-                                <span class="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/70 border border-emerald-200 rounded-full px-2.5 py-0.5 text-[11px]">
+                                <span class="inline-flex items-center gap-1.5 font-bold text-emerald-800 bg-white/90 border border-emerald-300 rounded-full px-3 py-1 shadow-2xs text-[11px]">
                                     <x-heroicon-s-check-circle class="h-3.5 w-3.5 text-emerald-600"/>
                                     Pertemuan ke-{{ $sudah->pertemuan_ke }}
                                 </span>
                             @else
-                                <span class="inline-flex items-center gap-1 font-bold text-amber-700 bg-amber-100/70 border border-amber-200 rounded-full px-2.5 py-0.5 text-[11px]">
+                                <span class="inline-flex items-center gap-1.5 font-bold text-amber-900 bg-white/90 border border-amber-300 rounded-full px-3 py-1 shadow-2xs text-[11px]">
                                     <x-heroicon-s-exclamation-circle class="h-3.5 w-3.5 text-amber-500"/>
                                     Belum Diisi
                                 </span>
                             @endif
 
                             @if ($isAktif)
-                                <span class="font-extrabold text-primary flex items-center gap-1 text-[11px]">
+                                <span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-black text-white shadow-xs"
+                                      style="background-color: {{ $warnaK['jp_bg'] }};">
+                                    <x-heroicon-s-check class="h-3.5 w-3.5"/>
                                     Aktif Dipilih
-                                    <x-heroicon-m-check class="h-3.5 w-3.5"/>
                                 </span>
                             @else
-                                <span class="text-slate-400 group-hover:text-primary transition text-[11px]">
-                                    Pilih Sesi →
+                                <span class="inline-flex items-center gap-1 text-xs font-extrabold transition group-hover:translate-x-0.5"
+                                      style="color: {{ $warnaK['jp_bg'] }};">
+                                    Pilih Kelas Ini →
                                 </span>
                             @endif
                         </div>
@@ -157,23 +178,29 @@
         @if ($sesiAktif)
             @php
                 $sudah = $sesiAktif->agenda;
-                $warnaAktif = $sesiAktif->warna_mapel;
+                $warnaAktifK = $sesiAktif->warna_kelas;
+                $warnaAktifM = $sesiAktif->warna_mapel;
             @endphp
 
-            <div class="kartu p-5 sm:p-6" style="border-top: 4px solid {{ $warnaAktif['accent'] }};">
+            <div class="kartu p-5 sm:p-6 shadow-sm" style="border-top: 6px solid {{ $warnaAktifK['accent'] }};">
                 {{-- Header Kelas Terpilih --}}
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 mb-5">
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center justify-center rounded px-2.5 py-1 text-xs font-black shadow-2xs"
-                                  style="background-color: {{ $warnaAktif['jp_bg'] }}; color: {{ $warnaAktif['jp_text'] }};">
+                            <span class="inline-flex items-center justify-center rounded-xl px-2.5 py-1 text-xs font-black shadow-xs"
+                                  style="background-color: {{ $warnaAktifK['jp_bg'] }}; color: {{ $warnaAktifK['jp_text'] }};">
                                 {{ $sesiAktif->label_jp }}
                             </span>
+                            <span class="inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-base font-black tracking-tight shadow-2xs"
+                                  style="background-color: {{ $warnaAktifK['badge_bg'] }}; color: {{ $warnaAktifK['badge_text'] }}; border: 1.5px solid {{ $warnaAktifK['border'] }};">
+                                <span class="h-2 w-2 rounded-full shrink-0 shadow-xs" style="background-color: {{ $warnaAktifK['accent'] }};"></span>
+                                <strong>{{ $sesiAktif->kelas_tampilan }}</strong>
+                            </span>
                             <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                                {{ $sesiAktif->kelas_tampilan }} — {{ $sesiAktif->nama_tampilan }}
+                                — {{ $sesiAktif->nama_tampilan }}
                             </h2>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-1.5">
+                        <p class="text-xs text-slate-500 mt-1.5 flex flex-wrap items-center gap-1.5">
                             <span>Pukul <strong>{{ $sesiAktif->jam }} WIB</strong></span>
                             @if ($sesiAktif->ruang)
                                 <span>· Ruang <strong>{{ $sesiAktif->ruang }}</strong></span>
@@ -183,8 +210,9 @@
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-xl bg-primary/10 px-3.5 py-1.5 text-xs font-black text-primary border border-primary/20">
-                            <x-heroicon-o-bookmark class="h-4 w-4"/>
+                        <span class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black shadow-2xs"
+                              style="background-color: {{ $warnaAktifK['badge_bg'] }}; color: {{ $warnaAktifK['badge_text'] }}; border: 1.5px solid {{ $warnaAktifK['border'] }};">
+                            <x-heroicon-o-bookmark class="h-4 w-4" style="color: {{ $warnaAktifK['accent'] }};"/>
                             Pertemuan ke-{{ $sudah ? $sudah->pertemuan_ke : $pertemuanKe }}
                         </span>
                     </div>
