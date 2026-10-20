@@ -42,7 +42,7 @@ class PresensiController extends Controller
                 ->tahunAktif()
                 ->where('guru_id', $guruId)
                 ->where('hari', $hari)
-                ->with(['kelas', 'mataPelajaran'])
+                ->with(['kelas' => fn ($q) => $q->withCount('siswas'), 'mataPelajaran'])
                 ->orderBy('jam_ke')
                 ->get()
             : collect();
@@ -325,9 +325,7 @@ class PresensiController extends Controller
             }
 
             $last = $currentBlock->last();
-            if ($last->kelas_id === $j->kelas_id
-                && $last->mata_pelajaran_id === $j->mata_pelajaran_id
-                && (int) $j->jam_ke === (int) $last->jam_ke + 1) {
+            if (\App\Support\SesiJadwal::apakahSatuSesi($last, $j)) {
                 $currentBlock->push($j);
             } else {
                 $sesiList->push($this->formatSesiObject($currentBlock, $sesiList->count() + 1, $agendaTersimpan));
@@ -350,12 +348,25 @@ class PresensiController extends Controller
         $totalJp = count($jamKeList);
         $scheduleIds = $schedules->pluck('id')->all();
 
+        $minJp = min($jamKeList);
+        $maxJp = max($jamKeList);
+
         $labelJp = $totalJp > 1
-            ? sprintf('JP %d–%d (%d JP)', min($jamKeList), max($jamKeList), $totalJp)
+            ? sprintf('JP %d–%d (%d JP)', $minJp, $maxJp, $totalJp)
             : sprintf('JP %d (1 JP)', $first->jam_ke);
 
-        $jamMulai = $first->jam_mulai ? substr((string) $first->jam_mulai, 0, 5) : null;
-        $jamSelesai = $last->jam_selesai ? substr((string) $last->jam_selesai, 0, 5) : null;
+        $labelJpSingkat = $totalJp > 1
+            ? sprintf('JP %d–%d', $minJp, $maxJp)
+            : sprintf('JP %d', $first->jam_ke);
+
+        $rentangJamKe = $totalJp > 1
+            ? sprintf('%d–%d', $minJp, $maxJp)
+            : (string) $first->jam_ke;
+
+        $jamMulaiRaw = $first->jam_mulai_aktif ?: $first->jam_mulai;
+        $jamSelesaiRaw = $last->jam_selesai_aktif ?: $last->jam_selesai;
+        $jamMulai = $jamMulaiRaw ? substr((string) $jamMulaiRaw, 0, 5) : null;
+        $jamSelesai = $jamSelesaiRaw ? substr((string) $jamSelesaiRaw, 0, 5) : null;
         $rentangWaktu = ($jamMulai && $jamSelesai) ? "{$jamMulai}–{$jamSelesai}" : null;
 
         $agenda = null;
@@ -368,7 +379,15 @@ class PresensiController extends Controller
 
         $presensisCount = $agenda ? $agenda->presensis->count() : 0;
         $jumlahHadir = $agenda ? $agenda->presensis->whereIn('status', [StatusPresensi::Hadir, StatusPresensi::Dispensasi])->count() : 0;
+        $jumlahSakit = $agenda ? $agenda->presensis->where('status', StatusPresensi::Sakit)->count() : 0;
+        $jumlahIzin = $agenda ? $agenda->presensis->where('status', StatusPresensi::Izin)->count() : 0;
+        $jumlahAlfa = $agenda ? $agenda->presensis->whereIn('status', [StatusPresensi::Alfa, StatusPresensi::Bolos])->count() : 0;
         $terisi = $presensisCount > 0;
+
+        $warnaKelas = \App\Support\WarnaKelas::untuk($first->kelas_tampilan, $first->isAgendaBersama());
+        $warnaMapel = \App\Support\WarnaMapel::untuk($first->nama_tampilan, $first->isAgendaBersama());
+        $sedangBerlangsung = $schedules->contains(fn ($j) => $j->sedangBerlangsung());
+        $totalSiswaKelas = $first->kelas?->siswas_count ?? ($first->kelas ? $first->kelas->siswas()->count() : 0);
 
         return (object) [
             'id' => 'sesi_' . $urutan,
@@ -383,12 +402,24 @@ class PresensiController extends Controller
             'first_schedule_id' => $first->id,
             'jam_ke_list' => $jamKeList,
             'label_jp' => $labelJp,
+            'label_jp_singkat' => $labelJpSingkat,
+            'rentang_jam_ke' => $rentangJamKe,
             'total_jp' => $totalJp,
+            'jam_mulai' => $jamMulai,
+            'jam_selesai' => $jamSelesai,
             'rentang_waktu' => $rentangWaktu,
+            'ruang' => $first->ruang,
             'agenda' => $agenda,
             'terisi' => $terisi,
             'presensis_count' => $presensisCount,
             'jumlah_hadir' => $jumlahHadir,
+            'jumlah_sakit' => $jumlahSakit,
+            'jumlah_izin' => $jumlahIzin,
+            'jumlah_alfa' => $jumlahAlfa,
+            'total_siswa_kelas' => $totalSiswaKelas,
+            'warna_kelas' => $warnaKelas,
+            'warna_mapel' => $warnaMapel,
+            'sedang_berlangsung' => $sedangBerlangsung,
         ];
     }
 

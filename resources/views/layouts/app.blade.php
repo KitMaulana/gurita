@@ -94,6 +94,152 @@
         .bg-violet-600 { background-color: #7c3aed !important; color: #ffffff !important; }
 
         /* Status Legend Aesthetic Badges & Cards */
+        .status-legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        @media (min-width: 640px) {
+            .status-legend-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .sm\:ml-auto { margin-left: auto; }
+            .sm\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1024px) {
+            .status-legend-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+            .lg\:grid-cols-6 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        }
+        .bg-slate-900 { background-color: #0f172a !important; }
+        .hover\:bg-slate-800:hover { background-color: #1e293b !important; }
+        .px-3\.5 { padding-left: 0.875rem; padding-right: 0.875rem; }
+        .p-3\.5 { padding: 0.875rem; }
+        .font-black { font-weight: 900; }
+        .place-items-center { place-items: center; }
+
+        /* Modern Sesi Pelajaran Cards (Global) */
+        .sesi-section-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .sesi-section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sesi-section-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #1A365D 0%, #2b548a 100%);
+            color: #ffffff;
+            box-shadow: 0 3px 8px rgba(26, 54, 93, 0.22);
+            flex-shrink: 0;
+        }
+        .sesi-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 16px;
+        }
+        @media (min-width: 640px) {
+            .sesi-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1024px) {
+            .sesi-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        .sesi-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 18px;
+            background-color: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            padding: 18px 18px 14px 18px;
+            text-decoration: none !important;
+            overflow: hidden;
+            transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.06), 0 1px 3px -1px rgba(15, 23, 42, 0.04);
+        }
+        .sesi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--sesi-accent, #1A365D);
+            transition: height 0.2s ease;
+        }
+        .sesi-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--sesi-accent, #94a3b8);
+            box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+        }
+        .sesi-card:hover .sesi-card-cta-arrow {
+            transform: translateX(4px);
+        }
+        .sesi-card.is-active {
+            background: linear-gradient(135deg, #102542 0%, #1A365D 55%, #234b7e 100%) !important;
+            border-color: #1A365D !important;
+            color: #ffffff !important;
+            box-shadow: 0 16px 32px -8px rgba(26, 54, 93, 0.42), 0 0 0 2px var(--sesi-accent, #3b82f6) !important;
+            transform: translateY(-2px);
+        }
+        .sesi-card.is-active::before {
+            height: 5px;
+            background: linear-gradient(90deg, var(--sesi-accent, #38bdf8), #ffffff, var(--sesi-accent, #38bdf8));
+        }
+        .btn-filter-dark {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            background-color: #1A365D !important;
+            color: #ffffff !important;
+            border: 1px solid #142B4A !important;
+            border-radius: 11px !important;
+            padding: 8px 14px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            line-height: 1.25 !important;
+            box-shadow: 0 2px 5px rgba(26, 54, 93, 0.2) !important;
+            transition: all 0.18s ease !important;
+            cursor: pointer;
+        }
+        .btn-filter-dark:hover {
+            background-color: #142B4A !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(26, 54, 93, 0.28) !important;
+        }
+        .btn-filter-light {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 5px !important;
+            background-color: #ffffff !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+            border-radius: 11px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            line-height: 1.25 !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+            transition: all 0.18s ease !important;
+            text-decoration: none !important;
+        }
+        .btn-filter-light:hover {
+            background-color: #f1f5f9 !important;
+            border-color: #94a3b8 !important;
+            color: #0f172a !important;
+        }
+
         .status-legend-card {
             display: flex !important;
             align-items: center !important;

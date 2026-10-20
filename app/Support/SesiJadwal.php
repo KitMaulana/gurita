@@ -135,8 +135,14 @@ class SesiJadwal
         }
 
         $presensisCount = $agenda ? $agenda->presensis->count() : 0;
+        $jumlahHadir = $agenda ? $agenda->presensis->whereIn('status', [\App\Enums\StatusPresensi::Hadir, \App\Enums\StatusPresensi::Dispensasi])->count() : 0;
+        $jumlahSakit = $agenda ? $agenda->presensis->where('status', \App\Enums\StatusPresensi::Sakit)->count() : 0;
+        $jumlahIzin = $agenda ? $agenda->presensis->where('status', \App\Enums\StatusPresensi::Izin)->count() : 0;
+        $jumlahAlfa = $agenda ? $agenda->presensis->whereIn('status', [\App\Enums\StatusPresensi::Alfa, \App\Enums\StatusPresensi::Bolos])->count() : 0;
         $warnaKelas = WarnaKelas::untuk($first->kelas_tampilan, $first->isAgendaBersama());
         $warnaMapel = WarnaMapel::untuk($first->nama_tampilan, $first->isAgendaBersama());
+        $sedangBerlangsung = $schedules->contains(fn ($j) => $j->sedangBerlangsung());
+        $totalSiswaKelas = $first->kelas?->siswas_count ?? ($first->kelas ? $first->kelas->siswas()->count() : 0);
 
         return (object) [
             'id' => 'sesi_'.$urutan,
@@ -163,12 +169,19 @@ class SesiJadwal
             'jam_mulai' => $jamMulai,
             'jam_selesai' => $jamSelesai,
             'jam' => $jam,
+            'rentang_waktu' => ($jamMulai && $jamSelesai) ? "{$jamMulai}–{$jamSelesai}" : null,
             'ruang' => $first->ruang,
             'agenda' => $agenda,
             'terisi' => (bool) $agenda,
             'presensis_count' => $presensisCount,
+            'jumlah_hadir' => $jumlahHadir,
+            'jumlah_sakit' => $jumlahSakit,
+            'jumlah_izin' => $jumlahIzin,
+            'jumlah_alfa' => $jumlahAlfa,
+            'total_siswa_kelas' => $totalSiswaKelas,
             'warna_kelas' => $warnaKelas,
             'warna_mapel' => $warnaMapel,
+            'sedang_berlangsung' => $sedangBerlangsung,
         ];
     }
 
