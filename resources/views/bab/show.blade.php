@@ -11,8 +11,8 @@
     </x-kepala-halaman>
 
     @if ($bab->capaian_pembelajaran)
-        <div class="kartu mb-6 p-5 bg-gradient-to-r from-indigo-50/70 via-white to-teal-50/40">
-            <p class="mb-1 text-xs font-extrabold uppercase tracking-wider text-primary">Capaian Pembelajaran (CP)</p>
+        <div class="kartu mb-6 p-5">
+            <p class="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Capaian Pembelajaran (CP)</p>
             <p class="text-sm leading-relaxed text-slate-700">{{ $bab->capaian_pembelajaran }}</p>
         </div>
     @endif

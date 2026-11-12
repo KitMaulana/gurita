@@ -16,7 +16,7 @@
         </x-slot:aksi>
     </x-kepala-halaman>
 
-    <form method="GET" class="kartu tanpa-cetak mb-6 grid gap-3.5 p-4 sm:p-5 sm:grid-cols-2 lg:grid-cols-5">
+    <form method="GET" class="kartu tanpa-cetak mb-6 grid gap-3.5 p-4 sm:grid-cols-2 lg:grid-cols-5">
         <x-bidang label="Dari Tanggal" nama="dari">
             <x-isian nama="dari" tipe="date" :value="request('dari')"/>
         </x-bidang>
@@ -38,13 +38,13 @@
     <x-tabel>
         <x-slot:kepala>
             <tr>
-                <th class="px-4 py-3.5">Tanggal</th>
-                <th class="px-4 py-3.5">Kelas & Mapel</th>
-                <th class="px-4 py-3.5 text-center">Pertemuan</th>
-                <th class="px-4 py-3.5">Judul Materi & Metode</th>
-                <th class="px-4 py-3.5">Status</th>
-                <th class="px-4 py-3.5">Presensi</th>
-                <th class="px-4 py-3.5 text-right">Aksi Cepat</th>
+                <th class="px-4 py-3 whitespace-nowrap">Tanggal</th>
+                <th class="px-4 py-3 whitespace-nowrap">Kelas & Mapel</th>
+                <th class="px-4 py-3 text-center whitespace-nowrap">Pertemuan</th>
+                <th class="px-4 py-3">Judul Materi & Metode</th>
+                <th class="px-4 py-3 whitespace-nowrap">Status</th>
+                <th class="px-4 py-3 whitespace-nowrap">Presensi</th>
+                <th class="px-4 py-3 text-right whitespace-nowrap">Aksi</th>
             </tr>
         </x-slot:kepala>
 
@@ -53,73 +53,72 @@
                 $namaKelas = $agenda->jadwal?->kelas_tampilan ?? '—';
                 $warnaK = WarnaKelas::untuk($namaKelas);
             @endphp
-            <tr class="hover:bg-indigo-50/30 transition">
+            <tr class="hover:bg-slate-50/80 transition-colors">
                 <td class="whitespace-nowrap px-4 py-3.5">
-                    <p class="font-bold text-slate-800">{{ Tanggal::angka($agenda->tanggal) }}</p>
-                    <p class="text-xs font-medium text-slate-400">{{ Tanggal::namaHari($agenda->tanggal) }}</p>
+                    <p class="font-semibold text-slate-800">{{ Tanggal::angka($agenda->tanggal) }}</p>
+                    <p class="text-xs text-slate-400">{{ Tanggal::namaHari($agenda->tanggal) }}</p>
                 </td>
-                <td class="px-4 py-3.5">
-                    <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-extrabold"
+                <td class="whitespace-nowrap px-4 py-3.5">
+                    <div class="flex items-center gap-1.5 flex-nowrap">
+                        <span class="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-xs font-semibold whitespace-nowrap shrink-0"
                               style="background-color: {{ $warnaK['badge_bg'] }}; color: {{ $warnaK['badge_text'] }}; border: 1px solid {{ $warnaK['border'] }};">
-                            <span class="h-1.5 w-1.5 rounded-full" style="background-color: {{ $warnaK['accent'] }};"></span>
+                            <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background-color: {{ $warnaK['accent'] }};"></span>
                             {{ $namaKelas }}
                         </span>
-                        <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+                        <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 whitespace-nowrap shrink-0">
                             {{ $agenda->label_jp }}
                         </span>
                     </div>
-                    <p class="mt-1 text-xs font-medium text-slate-500">{{ $agenda->jadwal?->nama_tampilan ?? '—' }}</p>
+                    <p class="mt-1 text-xs text-slate-500 whitespace-nowrap">{{ $agenda->jadwal?->nama_tampilan ?? '—' }}</p>
                 </td>
-                <td class="px-4 py-3.5 text-center">
-                    <span class="inline-flex items-center justify-center rounded-xl bg-slate-100 px-2.5 py-1 text-xs font-extrabold text-slate-700">
+                <td class="whitespace-nowrap px-4 py-3.5 text-center">
+                    <span class="inline-flex items-center justify-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700 whitespace-nowrap">
                         Ke-{{ $agenda->pertemuan_ke }}
                     </span>
                 </td>
-                <td class="px-4 py-3.5">
-                    <p class="font-bold text-slate-800">{{ $agenda->judul_materi }}</p>
-                    <div class="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                <td class="px-4 py-3.5 min-w-[200px]">
+                    <p class="font-medium text-slate-800">{{ $agenda->judul_materi }}</p>
+                    <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
                         @if ($agenda->bab)
-                            <span class="rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-bold text-primary">{{ $agenda->bab->kode }}</span>
+                            <span class="rounded bg-indigo-50 px-1.5 py-0.5 text-[10px] font-semibold text-primary whitespace-nowrap">{{ $agenda->bab->kode }}</span>
                         @endif
                         @if ($agenda->metode)
-                            <span>· {{ $agenda->metode }}</span>
+                            <span>{{ $agenda->metode }}</span>
                         @endif
                     </div>
                 </td>
-                <td class="px-4 py-3.5"><x-badge-status :status="$agenda->status"/></td>
-                <td class="px-4 py-3.5">
+                <td class="whitespace-nowrap px-4 py-3.5"><x-badge-status :status="$agenda->status"/></td>
+                <td class="whitespace-nowrap px-4 py-3.5">
                     @if ($agenda->presensis_count > 0)
                         <a href="{{ route('presensi.isi', $agenda) }}"
-                           class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-200/70 hover:bg-emerald-100 transition">
-                            <x-heroicon-s-check-circle class="h-3.5 w-3.5 text-emerald-500"/>
+                           class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors whitespace-nowrap">
+                            <x-heroicon-s-check-circle class="h-3.5 w-3.5 text-emerald-600 shrink-0"/>
                             {{ $agenda->presensis_count }} siswa
                         </a>
                     @else
                         <a href="{{ route('presensi.isi', $agenda) }}"
-                           class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-800 ring-1 ring-amber-200/80 hover:bg-amber-100 transition">
-                            <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                           class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 border border-amber-200 hover:bg-amber-100 transition-colors whitespace-nowrap">
                             Isi Presensi →
                         </a>
                     @endif
                 </td>
-                <td class="px-4 py-3.5">
-                    <div class="flex justify-end items-center gap-1.5">
+                <td class="whitespace-nowrap px-4 py-3.5">
+                    <div class="flex justify-end items-center gap-1.5 flex-nowrap">
                         <a href="{{ route('presensi.isi', $agenda) }}" title="Presensi Siswa"
-                           class="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:border-primary-200 hover:bg-primary-50 hover:text-primary transition">
-                            <x-heroicon-o-user-group class="h-4 w-4"/>
+                           class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors whitespace-nowrap">
+                            <x-heroicon-o-user-group class="h-4 w-4 shrink-0"/>
                             <span class="hidden xl:inline">Presensi</span>
                         </a>
                         @can('update', $agenda)
                             <a href="{{ route('agenda.edit', $agenda) }}" title="Ubah Agenda"
-                               class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5 text-slate-500 hover:border-primary-200 hover:bg-primary-50 hover:text-primary transition">
+                               class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition-colors">
                                 <x-heroicon-o-pencil-square class="h-4 w-4"/>
                             </a>
                             <form method="POST" action="{{ route('agenda.destroy', $agenda) }}"
                                   onsubmit="return confirm('Hapus agenda ini beserta presensinya? Tindakan ini tidak dapat dibatalkan.')">
                                 @csrf @method('DELETE')
                                 <button type="submit" title="Hapus"
-                                        class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition">
+                                        class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-colors">
                                     <x-heroicon-o-trash class="h-4 w-4"/>
                                 </button>
                             </form>

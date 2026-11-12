@@ -9,57 +9,30 @@
 
 @php
     $tema = match ($warna) {
-        'accent' => [
-            'ikon_bg' => 'bg-gradient-to-br from-teal-500 to-emerald-600 text-white shadow-lg shadow-teal-500/25',
-            'glow'    => 'from-teal-500/10 to-transparent',
-            'aksen'   => 'text-teal-600',
-        ],
-        'amber' => [
-            'ikon_bg' => 'bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25',
-            'glow'    => 'from-amber-500/10 to-transparent',
-            'aksen'   => 'text-amber-600',
-        ],
-        'sky' => [
-            'ikon_bg' => 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/25',
-            'glow'    => 'from-sky-500/10 to-transparent',
-            'aksen'   => 'text-sky-600',
-        ],
-        'rose' => [
-            'ikon_bg' => 'bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-lg shadow-rose-500/25',
-            'glow'    => 'from-rose-500/10 to-transparent',
-            'aksen'   => 'text-rose-600',
-        ],
-        default => [
-            'ikon_bg' => 'bg-gradient-to-br from-primary to-indigo-700 text-white shadow-lg shadow-primary/25',
-            'glow'    => 'from-primary/10 to-transparent',
-            'aksen'   => 'text-primary',
-        ],
+        'accent', 'aksen' => 'bg-teal-50 text-teal-700 ring-1 ring-teal-200/70',
+        'amber', 'peringatan' => 'bg-amber-50 text-amber-700 ring-1 ring-amber-200/70',
+        'sky' => 'bg-sky-50 text-sky-700 ring-1 ring-sky-200/70',
+        'rose', 'bahaya' => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200/70',
+        default => 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200/70',
     };
     $tag = $href ? 'a' : 'div';
 @endphp
 
 <{{ $tag }} @if ($href) href="{{ $href }}" @endif
-    {{ $attributes->merge(['class' => 'kartu group relative overflow-hidden flex items-center gap-4 p-5 ' . ($href ? 'kartu-hover cursor-pointer' : '')]) }}>
-    {{-- Efek glow dekoratif sudut kanan atas --}}
-    <div class="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-bl {{ $tema['glow'] }} blur-xl transition-transform duration-300 group-hover:scale-125"></div>
-
-    <div class="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl {{ $tema['ikon_bg'] }} transition-transform duration-200 group-hover:scale-105" style="width: 52px; height: 52px;">
-        <x-dynamic-component :component="'heroicon-o-'.$ikon" class="h-6 w-6"/>
+    {{ $attributes->merge(['class' => 'kartu group flex items-center gap-4 p-4 sm:p-5 ' . ($href ? 'kartu-hover cursor-pointer' : '')]) }}>
+    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg {{ $tema }}">
+        <x-dynamic-component :component="'heroicon-o-'.$ikon" class="h-5 w-5"/>
     </div>
 
     <div class="min-w-0 flex-1">
-        <p class="truncate text-xs font-bold uppercase tracking-wider text-slate-400">{{ $label }}</p>
-        <div class="mt-0.5 flex items-baseline gap-2">
-            <p class="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">{{ $nilai }}</p>
-        </div>
+        <p class="truncate text-xs font-medium text-slate-500">{{ $label }}</p>
+        <p class="mt-0.5 text-2xl font-bold tracking-tight text-slate-900 tabular-nums">{{ $nilai }}</p>
         @if ($keterangan)
-            <p class="mt-0.5 truncate text-xs font-medium text-slate-500">{{ $keterangan }}</p>
+            <p class="mt-0.5 truncate text-[11px] text-slate-400">{{ $keterangan }}</p>
         @endif
     </div>
 
     @if ($href)
-        <div class="shrink-0 text-slate-300 transition-all duration-200 group-hover:translate-x-1 {{ $tema['aksen'] }}">
-            <x-heroicon-o-arrow-up-right class="h-5 w-5"/>
-        </div>
+        <x-heroicon-o-chevron-right class="h-4 w-4 shrink-0 text-slate-300 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:text-slate-500"/>
     @endif
 </{{ $tag }}>

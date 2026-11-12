@@ -25,18 +25,17 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 38px;
-        height: 38px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background-color: #0f172a;
         color: #ffffff;
-        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
         flex-shrink: 0;
     }
     .sesi-cards-grid {
         display: grid;
         grid-template-columns: repeat(1, minmax(0, 1fr));
-        gap: 16px;
+        gap: 14px;
     }
     @media (min-width: 640px) {
         .sesi-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -49,14 +48,14 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        border-radius: 18px;
+        border-radius: 14px;
         background-color: #ffffff;
-        border: 1.5px solid #e2e8f0;
-        padding: 18px 18px 14px 18px;
+        border: 1px solid #e2e8f0;
+        padding: 16px 16px 13px 16px;
         text-decoration: none !important;
         overflow: hidden;
-        transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-        box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.06);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     }
     .sesi-card::before {
         content: "";
@@ -64,27 +63,25 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 5px;
+        height: 3px;
         background: var(--sesi-accent, #4f46e5);
     }
     .sesi-card:hover {
-        transform: translateY(-4px);
-        border-color: var(--sesi-accent, #6366f1);
-        box-shadow: 0 14px 28px -6px rgba(79, 70, 229, 0.14);
+        border-color: #cbd5e1;
+        box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.07);
     }
     .sesi-card.is-active {
-        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #4338ca 100%) !important;
-        border-color: #4f46e5 !important;
+        background-color: #0f172a !important;
+        border-color: #0f172a !important;
         color: #ffffff !important;
-        box-shadow: 0 16px 32px -8px rgba(49, 46, 129, 0.45), 0 0 0 2px var(--sesi-accent, #818cf8) !important;
-        transform: translateY(-2px);
+        box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.25) !important;
     }
 </style>
 @endpush
 
 @section('konten')
     <x-kepala-halaman judul="Isi Agenda Mengajar"
-                      keterangan="Pilih sesi kelas sesuai jadwal Anda, lalu catat agenda pembelajaran per kelas dengan cepat.">
+                      keterangan="Pilih sesi kelas sesuai jadwal Anda, lalu catat agenda pembelajaran per kelas.">
         <x-slot:aksi>
             <x-tombol gaya="garis" ikon="arrow-left" :href="route('agenda.index')">Daftar Agenda</x-tombol>
         </x-slot:aksi>
@@ -94,40 +91,37 @@
     <div class="kartu mb-6 p-4 sm:p-5">
         <form method="GET" action="{{ route('agenda.dari-jadwal') }}" class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Tanggal Pertemuan:</span>
+                <span class="text-xs font-semibold text-slate-600 whitespace-nowrap">Tanggal Pertemuan:</span>
                 <input type="date" name="tanggal" value="{{ $tanggal->toDateString() }}" onchange="this.form.submit()"
-                       class="rounded-xl border-slate-200 px-3 py-2 text-sm font-bold text-slate-800 shadow-xs focus:border-primary focus:ring-primary">
-                <button type="submit"
-                        class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-700 transition">
+                       class="rounded-lg border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-800 focus:border-primary focus:ring-primary">
+                <button type="submit" class="btn-filter-dark">
                     <x-heroicon-o-magnifying-glass class="h-3.5 w-3.5"/>
                     <span>Tampilkan</span>
                 </button>
                 <a href="{{ route('agenda.dari-jadwal', ['tanggal' => today()->toDateString()]) }}"
-                   class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition">
+                   class="btn-filter-light">
                     Hari Ini
                 </a>
                 <div class="flex items-center gap-1">
                     <a href="{{ route('agenda.dari-jadwal', ['tanggal' => $tanggal->copy()->subDay()->toDateString()]) }}"
                        title="Hari Sebelumnya"
-                       class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-xs hover:bg-slate-50 transition">
+                       class="btn-filter-light" style="padding: 8px 9px !important;">
                         <x-heroicon-o-chevron-left class="h-4 w-4"/>
                     </a>
                     <a href="{{ route('agenda.dari-jadwal', ['tanggal' => $tanggal->copy()->addDay()->toDateString()]) }}"
                        title="Hari Berikutnya"
-                       class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-xs hover:bg-slate-50 transition">
+                       class="btn-filter-light" style="padding: 8px 9px !important;">
                         <x-heroicon-o-chevron-right class="h-4 w-4"/>
                     </a>
                 </div>
             </div>
 
             <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
-                <span class="inline-flex items-center justify-center rounded-xl bg-primary-50 p-1.5 text-primary ring-1 ring-primary-100">
-                    <x-heroicon-o-calendar class="h-4 w-4"/>
-                </span>
-                <span>Hari <strong class="text-slate-900">{{ $hari?->label() ?? '—' }}</strong>, {{ Tanggal::lengkap($tanggal) }}</span>
+                <x-heroicon-o-calendar class="h-4 w-4 text-slate-400 shrink-0"/>
+                <span>Hari <strong class="font-semibold text-slate-900">{{ $hari?->label() ?? '—' }}</strong>, {{ Tanggal::lengkap($tanggal) }}</span>
                 @if (\App\Support\JamPelajaran::isModeRamadhan())
-                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 border border-emerald-200">
-                        🌙 Mode Ramadhan
+                    <span class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 border border-emerald-200 whitespace-nowrap">
+                        Mode Ramadhan
                     </span>
                 @endif
             </div>
@@ -136,18 +130,14 @@
 
     @if (! $hari)
         <div class="kartu p-10 text-center">
-            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
-                <x-heroicon-o-face-smile class="h-9 w-9"/>
-            </div>
-            <p class="mt-4 font-extrabold text-slate-800">Tanggal yang dipilih jatuh pada hari Minggu</p>
-            <p class="mt-1 text-sm text-slate-500">Tidak ada jadwal mengajar pada hari Minggu. Selamat beristirahat!</p>
+            <x-heroicon-o-calendar class="mx-auto h-10 w-10 text-slate-300"/>
+            <p class="mt-3 font-semibold text-slate-800">Tanggal yang dipilih jatuh pada hari Minggu</p>
+            <p class="mt-1 text-sm text-slate-500">Tidak ada jadwal mengajar pada hari Minggu.</p>
         </div>
     @elseif ($sesiList->isEmpty())
         <div class="kartu p-10 text-center">
-            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
-                <x-heroicon-o-calendar-days class="h-9 w-9"/>
-            </div>
-            <p class="mt-4 font-extrabold text-slate-800">Tidak ada jadwal mengajar pada hari {{ $hari->label() }}</p>
+            <x-heroicon-o-calendar-days class="mx-auto h-10 w-10 text-slate-300"/>
+            <p class="mt-3 font-semibold text-slate-800">Tidak ada jadwal mengajar pada hari {{ $hari->label() }}</p>
             <p class="mt-1 text-sm text-slate-500">Silakan pilih tanggal lain yang memiliki jadwal mengajar.</p>
         </div>
     @else
@@ -159,17 +149,16 @@
                         <x-heroicon-o-clipboard-document-list class="h-5 w-5"/>
                     </span>
                     <div>
-                        <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-800" style="line-height: 1.2;">
+                        <h3 class="text-sm font-bold text-slate-900">
                             Sesi Mengajar Hari {{ $hari->label() }} — Pilih Kelas
                         </h3>
-                        <p class="text-xs text-slate-500 mt-0.5">
+                        <p class="text-xs text-slate-500">
                             Klik kartu sesi kelas yang ingin Anda catat agendanya. Pengisian dilakukan per kelas sesuai jadwal.
                         </p>
                     </div>
                 </div>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1 text-xs font-bold text-slate-700 border border-slate-200 shadow-xs">
-                    <span class="h-2 w-2 rounded-full bg-primary"></span>
-                    <span>{{ $sesiList->count() }} Sesi Terjadwal ({{ $jadwals->count() }} JP)</span>
+                <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1 text-xs font-semibold text-slate-700 border border-slate-200 whitespace-nowrap">
+                    {{ $sesiList->count() }} Sesi ({{ $jadwals->count() }} JP)
                 </span>
             </div>
 
@@ -188,99 +177,83 @@
                        style="--sesi-accent: {{ $warnaK['accent'] }};">
                         <div>
                             {{-- Baris Atas: JP, Durasi & Status Agenda --}}
-                            <div class="flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="inline-flex items-center gap-1 font-extrabold text-xs"
-                                          style="padding: 4px 10px; border-radius: 9px; white-space: nowrap; {{ $isAktif ? 'background-color: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.32);' : 'background-color: '.$warnaK['jp_bg'].'; color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);' }}">
-                                        <x-heroicon-o-clock class="h-3.5 w-3.5 shrink-0"/>
+                            <div class="flex items-center justify-between gap-2 flex-nowrap">
+                                <div class="flex items-center gap-1.5 flex-nowrap">
+                                    <span class="inline-flex items-center gap-1 font-semibold text-xs whitespace-nowrap shrink-0 rounded-md px-2 py-0.5"
+                                          style="{{ $isAktif ? 'background-color: rgba(255,255,255,0.16); color: #ffffff;' : 'background-color: '.$warnaK['jp_bg'].'; color: #ffffff;' }}">
                                         <span>{{ $jpSingkat }}</span>
                                     </span>
-                                    <span class="inline-flex items-center font-bold text-[11px]"
-                                          style="padding: 3px 8px; border-radius: 8px; white-space: nowrap; {{ $isAktif ? 'background-color: rgba(255,255,255,0.12); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.2);' : 'background-color: '.$warnaK['badge_bg'].'; color: '.$warnaK['badge_text'].'; border: 1px solid '.$warnaK['border'].';' }}">
+                                    <span class="inline-flex items-center font-semibold text-[11px] whitespace-nowrap shrink-0 rounded-md px-2 py-0.5"
+                                          style="{{ $isAktif ? 'background-color: rgba(255,255,255,0.08); color: #cbd5e1;' : 'background-color: '.$warnaK['badge_bg'].'; color: '.$warnaK['badge_text'].';' }}">
                                         {{ $sesi->total_jp }} JP
                                     </span>
                                 </div>
 
                                 @if ($sudah)
-                                    <span class="inline-flex items-center gap-1 rounded-full text-[11px] font-extrabold"
-                                          style="padding: 3.5px 10px; white-space: nowrap; {{ $isAktif ? 'background-color: #10b981; color: #ffffff; border: 1px solid #34d399; box-shadow: 0 2px 8px rgba(16,185,129,0.35);' : 'background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;' }}">
-                                        <x-heroicon-s-check-circle class="h-3.5 w-3.5 shrink-0" style="{{ $isAktif ? 'color: #ffffff;' : 'color: #059669;' }}"/>
-                                        <span>Pertemuan ke-{{ $sudah->pertemuan_ke }}</span>
+                                    <span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap shrink-0"
+                                          style="{{ $isAktif ? 'background-color: #059669; color: #ffffff;' : 'background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;' }}">
+                                        <x-heroicon-s-check-circle class="h-3.5 w-3.5 shrink-0"/>
+                                        <span>Pertemuan {{ $sudah->pertemuan_ke }}</span>
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 rounded-full text-[11px] font-extrabold"
-                                          style="padding: 3.5px 10px; white-space: nowrap; {{ $isAktif ? 'background-color: #f59e0b; color: #ffffff; border: 1px solid #fbbf24; box-shadow: 0 2px 8px rgba(245,158,11,0.35);' : 'background-color: #fffbeb; color: #92400e; border: 1px solid #fde68a;' }}">
-                                        <span class="h-2 w-2 rounded-full shrink-0" style="background-color: {{ $isAktif ? '#ffffff' : '#f59e0b' }};"></span>
+                                    <span class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap shrink-0"
+                                          style="{{ $isAktif ? 'background-color: #d97706; color: #ffffff;' : 'background-color: #fffbeb; color: #92400e; border: 1px solid #fde68a;' }}">
                                         <span>Belum Diisi</span>
                                     </span>
                                 @endif
                             </div>
 
-                            {{-- Baris Tengah: Avatar Sesi + Kelas & Mapel --}}
-                            <div class="mt-3 flex items-center gap-3" style="margin-top: 14px;">
-                                <div class="flex flex-col items-center justify-center shrink-0"
-                                     style="width: 46px; height: 46px; min-width: 46px; border-radius: 13px; {{ $isAktif ? 'background-color: rgba(255,255,255,0.14); color: #ffffff; border: 1.5px solid rgba(255,255,255,0.28);' : 'background-color: '.$warnaK['bg_card'].'; color: '.$warnaK['badge_text'].'; border: 1.5px solid '.$warnaK['border'].';' }}">
-                                    <span style="font-size: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; line-height: 1;">SESI</span>
-                                    <span style="font-size: 16px; font-weight: 900; line-height: 1.15; margin-top: 2px;">#{{ $sesi->urutan }}</span>
+                            {{-- Baris Tengah: Kelas & Mapel --}}
+                            <div class="mt-3.5 flex items-center gap-3">
+                                <div class="flex flex-col items-center justify-center shrink-0 w-11 h-11 rounded-lg"
+                                     style="{{ $isAktif ? 'background-color: rgba(255,255,255,0.12); color: #ffffff;' : 'background-color: '.$warnaK['bg_card'].'; color: '.$warnaK['badge_text'].'; border: 1px solid '.$warnaK['border'].';' }}">
+                                    <span class="text-[8px] font-bold uppercase opacity-75 leading-none">SESI</span>
+                                    <span class="text-sm font-bold leading-tight mt-0.5">#{{ $sesi->urutan }}</span>
                                 </div>
 
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-2">
-                                        <span class="truncate font-extrabold"
-                                              style="font-size: 18px; line-height: 1.2; letter-spacing: -0.02em; color: {{ $isAktif ? '#ffffff' : '#0f172a' }};">
+                                        <span class="truncate text-base font-bold"
+                                              style="color: {{ $isAktif ? '#ffffff' : '#0f172a' }};">
                                             {{ $sesi->kelas_tampilan }}
                                         </span>
-                                        <span class="h-2 w-2 rounded-full shrink-0"
-                                              style="background-color: {{ $warnaK['accent'] }};"></span>
                                         @if ($sesi->first_schedule->sedangBerlangsung())
-                                            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider"
-                                                  style="background-color: #ef4444; color: #ffffff;">
-                                                LIVE
+                                            <span class="rounded bg-rose-600 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white shrink-0">
+                                                Aktif
                                             </span>
                                         @endif
                                     </div>
-                                    <p class="truncate text-xs font-semibold mt-1 flex items-center gap-1.5"
-                                       style="color: {{ $isAktif ? 'rgba(255,255,255,0.85)' : '#475569' }};">
-                                        <span class="h-1.5 w-1.5 rounded-full shrink-0" style="background-color: {{ $isAktif ? '#38bdf8' : $warnaM['dot'] }};"></span>
-                                        <span class="truncate">{{ $sesi->nama_tampilan }}</span>
+                                    <p class="truncate text-xs mt-0.5"
+                                       style="color: {{ $isAktif ? '#cbd5e1' : '#64748b' }};">
+                                        {{ $sesi->nama_tampilan }}
                                     </p>
                                 </div>
                             </div>
 
                             {{-- Strip Info Waktu & Ruang --}}
-                            <div class="flex items-center justify-between gap-2 text-xs font-bold"
-                                 style="margin-top: 14px; padding: 8px 12px; border-radius: 11px; {{ $isAktif ? 'background-color: rgba(255,255,255,0.11); border: 1px solid rgba(255,255,255,0.18); color: #f8fafc;' : 'background-color: #f8fafc; border: 1px solid #e2e8f0; color: #334155;' }}">
-                                <div class="flex items-center gap-1.5 truncate">
-                                    <x-heroicon-o-clock class="h-3.5 w-3.5 shrink-0" style="color: {{ $isAktif ? '#93c5fd' : '#64748b' }};"/>
+                            <div class="mt-3.5 flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs font-medium"
+                                 style="{{ $isAktif ? 'background-color: rgba(255,255,255,0.08); color: #e2e8f0;' : 'background-color: #f8fafc; border: 1px solid #e2e8f0; color: #475569;' }}">
+                                <div class="flex items-center gap-1.5 whitespace-nowrap">
+                                    <x-heroicon-o-clock class="h-3.5 w-3.5 opacity-75 shrink-0"/>
                                     <span>{{ $sesi->jam }} WIB</span>
                                 </div>
                                 @if ($sesi->ruang)
-                                    <div class="flex items-center gap-1 shrink-0">
-                                        <span>Ruang {{ $sesi->ruang }}</span>
-                                    </div>
+                                    <span class="whitespace-nowrap">Ruang {{ $sesi->ruang }}</span>
                                 @endif
                             </div>
                         </div>
 
-                        {{-- Baris Bawah: Status Agenda & Indikator Aksi --}}
-                        <div class="flex items-center justify-between gap-2"
-                             style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed {{ $isAktif ? 'rgba(255,255,255,0.22)' : '#e2e8f0' }}; font-size: 11px; font-weight: 700;">
-                            <span style="color: {{ $isAktif ? 'rgba(255,255,255,0.8)' : '#64748b' }};" class="truncate">
+                        {{-- Baris Bawah --}}
+                        <div class="mt-3 flex items-center justify-between gap-2 pt-2.5 text-[11px] font-medium"
+                             style="border-top: 1px solid {{ $isAktif ? 'rgba(255,255,255,0.12)' : '#f1f5f9' }};">
+                            <span style="color: {{ $isAktif ? '#cbd5e1' : '#64748b' }};" class="truncate">
                                 {{ $sudah ? Str::limit($sudah->judul_materi, 28) : 'Klik untuk isi agenda' }}
                             </span>
 
                             @if ($isAktif)
-                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold shrink-0"
-                                      style="background-color: rgba(255,255,255,0.2); color: #ffffff; border: 1px solid rgba(255,255,255,0.3);">
-                                    <span class="h-1.5 w-1.5 rounded-full" style="background-color: #34d399;"></span>
-                                    <span>Aktif Dipilih</span>
-                                </span>
+                                <span class="shrink-0 font-semibold text-emerald-400 whitespace-nowrap">Dipilih</span>
                             @else
-                                <span class="inline-flex items-center gap-1 shrink-0 font-extrabold"
-                                      style="color: {{ $warnaK['jp_bg'] }};">
-                                    <span>Pilih Sesi</span>
-                                    <span class="sesi-card-cta-arrow" style="display: inline-block; transition: transform 0.2s ease;">→</span>
-                                </span>
+                                <span class="shrink-0 font-semibold text-primary whitespace-nowrap">Pilih →</span>
                             @endif
                         </div>
                     </a>
@@ -293,105 +266,91 @@
             @php
                 $sudah = $sesiAktif->agenda;
                 $warnaAktifK = $sesiAktif->warna_kelas;
-                $warnaAktifM = $sesiAktif->warna_mapel;
             @endphp
 
-            <div class="kartu p-5 sm:p-6 shadow-sm" style="border-top: 6px solid {{ $warnaAktifK['accent'] }};">
-                {{-- Header Kelas Terpilih --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100 mb-5">
+            <div class="kartu p-5 sm:p-6" style="border-top: 3px solid {{ $warnaAktifK['accent'] }};">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 mb-5">
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="inline-flex items-center justify-center rounded-xl px-2.5 py-1 text-xs font-black shadow-xs"
+                            <span class="rounded-md px-2.5 py-0.5 text-xs font-bold whitespace-nowrap"
                                   style="background-color: {{ $warnaAktifK['jp_bg'] }}; color: {{ $warnaAktifK['jp_text'] }};">
                                 {{ $sesiAktif->label_jp }}
                             </span>
-                            <span class="inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-base font-black tracking-tight shadow-2xs"
-                                  style="background-color: {{ $warnaAktifK['badge_bg'] }}; color: {{ $warnaAktifK['badge_text'] }}; border: 1.5px solid {{ $warnaAktifK['border'] }};">
-                                <span class="h-2 w-2 rounded-full shrink-0 shadow-xs" style="background-color: {{ $warnaAktifK['accent'] }};"></span>
-                                <strong>{{ $sesiAktif->kelas_tampilan }}</strong>
+                            <span class="rounded-md px-2.5 py-0.5 text-sm font-bold whitespace-nowrap"
+                                  style="background-color: {{ $warnaAktifK['badge_bg'] }}; color: {{ $warnaAktifK['badge_text'] }}; border: 1px solid {{ $warnaAktifK['border'] }};">
+                                {{ $sesiAktif->kelas_tampilan }}
                             </span>
-                            <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                                — {{ $sesiAktif->nama_tampilan }}
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900">
+                                {{ $sesiAktif->nama_tampilan }}
                             </h2>
                         </div>
                         <p class="text-xs text-slate-500 mt-1.5 flex flex-wrap items-center gap-1.5">
-                            <span>Pukul <strong>{{ $sesiAktif->jam }} WIB</strong></span>
+                            <span>Pukul <strong class="text-slate-700">{{ $sesiAktif->jam }} WIB</strong></span>
                             @if ($sesiAktif->ruang)
-                                <span>· Ruang <strong>{{ $sesiAktif->ruang }}</strong></span>
+                                <span>· Ruang <strong class="text-slate-700">{{ $sesiAktif->ruang }}</strong></span>
                             @endif
                             <span>· {{ Tanggal::lengkap($tanggal) }}</span>
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <span class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black shadow-2xs"
-                              style="background-color: {{ $warnaAktifK['badge_bg'] }}; color: {{ $warnaAktifK['badge_text'] }}; border: 1.5px solid {{ $warnaAktifK['border'] }};">
-                            <x-heroicon-o-bookmark class="h-4 w-4" style="color: {{ $warnaAktifK['accent'] }};"/>
-                            Pertemuan ke-{{ $sudah ? $sudah->pertemuan_ke : $pertemuanKe }}
-                        </span>
-                    </div>
+                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 whitespace-nowrap self-start sm:self-center">
+                        <x-heroicon-o-bookmark class="h-4 w-4 text-slate-500"/>
+                        Pertemuan ke-{{ $sudah ? $sudah->pertemuan_ke : $pertemuanKe }}
+                    </span>
                 </div>
 
-                {{-- Alert jika agenda sudah pernah disimpan --}}
                 @if ($sudah)
-                    <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+                    <div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
                         <div class="flex items-start sm:items-center gap-3">
-                            <x-heroicon-s-check-circle class="h-6 w-6 text-emerald-600 shrink-0 mt-0.5 sm:mt-0"/>
+                            <x-heroicon-s-check-circle class="h-5 w-5 text-emerald-600 shrink-0 mt-0.5 sm:mt-0"/>
                             <div>
-                                <p class="text-sm font-bold text-emerald-900">
+                                <p class="text-sm font-semibold text-emerald-950">
                                     Agenda kelas ini sudah tersimpan (Pertemuan ke-{{ $sudah->pertemuan_ke }})
                                 </p>
-                                <p class="text-xs text-emerald-700 mt-0.5">
+                                <p class="text-xs text-emerald-800 mt-0.5">
                                     Status: <strong>{{ $sudah->status->label() }}</strong>
                                     @if ($sudah->presensis_count > 0)
                                         · Presensi siswa sudah terisi ({{ $sudah->presensis_count }} siswa)
                                     @else
-                                        · <span class="font-bold text-amber-800">Presensi siswa belum diisi</span>
+                                        · <span class="font-semibold text-amber-800">Presensi siswa belum diisi</span>
                                     @endif
                                 </p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 self-end sm:self-center">
-                            <x-tombol gaya="aksen" :href="route('presensi.isi', $sudah)" ikon="user-group">
-                                {{ $sudah->presensis_count > 0 ? 'Lihat / Ubah Presensi' : 'Isi Presensi Sekarang' }}
-                            </x-tombol>
-                        </div>
+                        <x-tombol gaya="aksen" :href="route('presensi.isi', $sudah)" ikon="user-group">
+                            {{ $sudah->presensis_count > 0 ? 'Lihat / Ubah Presensi' : 'Isi Presensi Sekarang' }}
+                        </x-tombol>
                     </div>
                 @endif
 
-                {{-- Improvisasi Pintar: Pengingat Pertemuan Sebelumnya --}}
                 @if ($agendaSebelumnya)
-                    <div class="mb-5 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 text-xs text-slate-700">
-                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                            <span class="inline-flex items-center gap-1.5 font-extrabold text-indigo-950 uppercase tracking-wider text-[11px]">
-                                <x-heroicon-o-light-bulb class="h-4 w-4 text-primary"/>
-                                Materi Pertemuan Sebelumnya (Pertemuan ke-{{ $agendaSebelumnya->pertemuan_ke }}, {{ Tanggal::lengkap($agendaSebelumnya->tanggal) }}):
+                    <div class="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 p-4 text-xs text-slate-700">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                            <span class="inline-flex items-center gap-1.5 font-semibold text-slate-600">
+                                <x-heroicon-o-clock class="h-4 w-4 text-slate-400"/>
+                                Materi Pertemuan Sebelumnya (Pertemuan ke-{{ $agendaSebelumnya->pertemuan_ke }}, {{ Tanggal::lengkap($agendaSebelumnya->tanggal) }})
                             </span>
                             <button type="button"
                                     onclick="document.getElementById('judul_materi').value = {{ Js::from($agendaSebelumnya->judul_materi) }}; document.getElementById('judul_materi').focus();"
-                                    class="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1 font-bold text-primary shadow-2xs ring-1 ring-indigo-200 hover:bg-indigo-50 transition">
+                                    class="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-primary hover:bg-slate-50 transition-colors whitespace-nowrap">
                                 Gunakan Judul Ini →
                             </button>
                         </div>
-                        <p class="font-bold text-slate-900 text-sm">
-                            "{{ $agendaSebelumnya->judul_materi }}"
+                        <p class="font-semibold text-slate-900 text-sm">
+                            {{ $agendaSebelumnya->judul_materi }}
                         </p>
-                        <div class="mt-1 flex flex-wrap items-center gap-3 text-slate-500 text-xs">
+                        <div class="mt-1 flex flex-wrap items-center gap-3 text-slate-500">
                             @if ($agendaSebelumnya->bab)
-                                <span>Bab: <strong>{{ $agendaSebelumnya->bab->judul }}</strong></span>
+                                <span>Bab: <strong class="text-slate-700">{{ $agendaSebelumnya->bab->judul }}</strong></span>
                             @endif
                             @if ($agendaSebelumnya->metode)
-                                <span>Metode: <strong>{{ $agendaSebelumnya->metode }}</strong></span>
-                            @endif
-                            @if ($agendaSebelumnya->uraian_kegiatan)
-                                <span class="italic max-w-lg truncate">"{{ Str::limit($agendaSebelumnya->uraian_kegiatan, 100) }}"</span>
+                                <span>Metode: <strong class="text-slate-700">{{ $agendaSebelumnya->metode }}</strong></span>
                             @endif
                         </div>
                     </div>
                 @endif
 
-                {{-- Formulir Input Agenda Kelas --}}
                 <form method="POST" action="{{ route('agenda.simpan-massal') }}" id="formAgendaKelas">
                     @csrf
                     <input type="hidden" name="tanggal" value="{{ $tanggal->toDateString() }}">
@@ -399,14 +358,13 @@
                     <input type="hidden" name="lanjut_presensi" id="inputLanjutPresensi" value="1">
 
                     <div class="grid gap-5 md:grid-cols-2">
-                        {{-- Judul Materi --}}
                         <x-bidang label="Judul Materi / Topik Pembelajaran" nama="judul_materi" :wajib="true">
                             <input type="text" id="judul_materi" name="judul_materi"
-                                    list="datalist-bab-tp"
+                                   list="datalist-bab-tp"
                                    value="{{ old('judul_materi', $sudah?->judul_materi) }}"
                                    placeholder="mis. Menulis Teks Editorial"
                                    required
-                                   class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
+                                   class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">
                             <datalist id="datalist-bab-tp">
                                 @foreach ($babs as $bab)
                                     <option value="{{ $bab->judul }}"></option>
@@ -418,11 +376,11 @@
 
                             @if ($babs->isNotEmpty())
                                 <div class="mt-2 flex flex-wrap items-center gap-1.5">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Cepat Bab:</span>
+                                    <span class="text-[11px] font-medium text-slate-400">Pilih Bab:</span>
                                     @foreach ($babs->take(5) as $bab)
                                         <button type="button"
                                                 onclick="document.getElementById('bab_id').value = '{{ $bab->id }}'; if(!document.getElementById('judul_materi').value) document.getElementById('judul_materi').value = {{ Js::from($bab->judul) }};"
-                                                class="rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600 hover:border-primary-300 hover:bg-primary-50 hover:text-primary transition">
+                                                class="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
                                             {{ $bab->kode }}: {{ Str::limit($bab->judul, 24) }}
                                         </button>
                                     @endforeach
@@ -430,10 +388,9 @@
                             @endif
                         </x-bidang>
 
-                        {{-- Bab / Lingkup Materi --}}
                         <x-bidang label="Bab / Lingkup Materi" nama="bab_id">
                             <select id="bab_id" name="bab_id"
-                                    class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
+                                    class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">
                                 <option value="">— Tidak ditautkan / Pilih Bab —</option>
                                 @foreach ($babs as $bab)
                                     <option value="{{ $bab->id }}" @selected(($sudah?->bab_id ?? old('bab_id')) === $bab->id)>
@@ -443,13 +400,12 @@
                             </select>
                         </x-bidang>
 
-                        {{-- Metode Pembelajaran + Quick Fill Chips --}}
                         <x-bidang label="Metode Pembelajaran" nama="metode">
                             <input type="text" id="metode" name="metode"
                                    list="datalist-metode"
                                    value="{{ old('metode', $sudah?->metode) }}"
                                    placeholder="mis. Diskusi kelompok, Praktik, dll."
-                                   class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
+                                   class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">
                             <datalist id="datalist-metode">
                                 <option value="Ceramah interaktif"></option>
                                 <option value="Diskusi kelompok & presentasi"></option>
@@ -460,21 +416,20 @@
                                 <option value="Tanya jawab & refleksi"></option>
                             </datalist>
                             <div class="mt-2 flex flex-wrap items-center gap-1.5">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Klik Cepat:</span>
+                                <span class="text-[11px] font-medium text-slate-400">Opsi Cepat:</span>
                                 @foreach (['Ceramah Interaktif', 'Diskusi Kelompok', 'Praktik / Demonstrasi', 'PBL', 'PjBL', 'Latihan Soal & Kuis'] as $chipMetode)
                                     <button type="button"
                                             onclick="document.getElementById('metode').value = '{{ $chipMetode }}'"
-                                            class="rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600 hover:border-primary-300 hover:bg-primary-50 hover:text-primary transition">
-                                        + {{ $chipMetode }}
+                                            class="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
+                                        {{ $chipMetode }}
                                     </button>
                                 @endforeach
                             </div>
                         </x-bidang>
 
-                        {{-- Status Pertemuan --}}
                         <x-bidang label="Status Pertemuan" nama="status" :wajib="true">
                             <select id="status" name="status" required
-                                    class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
+                                    class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">
                                 @foreach ($statusList as $nilai => $label)
                                     <option value="{{ $nilai }}"
                                         @selected(($sudah?->status?->value ?? old('status', 'terlaksana')) === $nilai)>
@@ -484,40 +439,38 @@
                             </select>
                         </x-bidang>
 
-                        {{-- Uraian Kegiatan --}}
                         <x-bidang label="Uraian Kegiatan Pembelajaran" nama="uraian_kegiatan" class="md:col-span-2">
                             <textarea id="uraian_kegiatan" name="uraian_kegiatan" rows="3"
                                       placeholder="Ringkasan kegiatan pembelajaran, materi inti yang dibahas, atau catatan khusus kelas ini"
-                                      class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">{{ old('uraian_kegiatan', $sudah?->uraian_kegiatan) }}</textarea>
+                                      class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">{{ old('uraian_kegiatan', $sudah?->uraian_kegiatan) }}</textarea>
                         </x-bidang>
                     </div>
 
-                    {{-- Tombol Aksi --}}
                     <div class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
                         <div>
                             @if ($sudah)
                                 <button type="submit" form="formHapusAgenda"
-                                        class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-600 hover:text-rose-800 transition">
+                                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-600 hover:text-rose-800 transition-colors">
                                     <x-heroicon-o-trash class="h-4 w-4"/>
                                     Hapus Agenda Kelas Ini
                                 </button>
                             @endif
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2.5">
+                        <div class="flex flex-wrap items-center gap-2">
                             <x-tombol gaya="halus" :href="route('agenda.index')">Batal</x-tombol>
 
                             <button type="submit"
                                     onclick="document.getElementById('inputLanjutPresensi').value = '0'"
-                                    class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition">
+                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
                                 <x-heroicon-o-check class="h-4 w-4 text-slate-500"/>
                                 Simpan Agenda Saja
                             </button>
 
                             <button type="submit"
                                     onclick="document.getElementById('inputLanjutPresensi').value = '1'"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-accent/25 hover:from-accent-600 hover:to-teal-600 transition">
-                                <x-heroicon-o-arrow-right-circle class="h-5 w-5"/>
+                                    class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-slate-800 transition-colors">
+                                <x-heroicon-o-arrow-right-circle class="h-4 w-4"/>
                                 Simpan & Lanjut Presensi
                             </button>
                         </div>

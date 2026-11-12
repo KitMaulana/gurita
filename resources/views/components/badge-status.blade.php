@@ -10,7 +10,7 @@
         : ucfirst(str_replace('_', ' ', (string) $status));
 @endphp
 
-<span {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-bold shadow-2xs '.$warna]) }}>
-    <span class="h-1.5 w-1.5 rounded-full bg-current opacity-75"></span>
+<span {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 whitespace-nowrap shrink-0 rounded-md border px-2 py-0.5 text-xs font-semibold '.$warna]) }}>
+    <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-current opacity-75"></span>
     {{ $teks }}
 </span>

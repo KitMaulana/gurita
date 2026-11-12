@@ -7,34 +7,34 @@
     <x-kepala-halaman judul="Profil & Akun Saya"
                       keterangan="Data ini muncul pada kartu sambutan beranda dan tanda tangan dokumen cetak resmi."/>
 
-    {{-- Preview Kartu Profil Guru --}}
-    <div class="kartu mb-6 max-w-4xl overflow-hidden bg-gradient-to-r from-[#1E1B4B] via-[#312E81] to-primary p-6 text-white shadow-lg shadow-indigo-950/10">
+    {{-- Kartu Ringkas Profil Guru --}}
+    <div class="kartu mb-6 max-w-4xl p-5 sm:p-6">
         <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             @if ($pengguna->foto)
                 <img src="{{ $pengguna->foto_url ?? Storage::url($pengguna->foto) }}" alt="Foto profil"
-                     class="h-16 w-16 rounded-2xl object-cover ring-2 ring-white/30"
+                     class="h-16 w-16 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="hidden h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-2xl font-extrabold text-white ring-2 ring-white/30">
+                <div class="hidden h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xl font-bold text-white">
                     {{ $pengguna->inisial }}
                 </div>
             @else
-                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-2xl font-extrabold text-white ring-2 ring-white/30">
+                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xl font-bold text-white">
                     {{ $pengguna->inisial }}
                 </div>
             @endif
             <div class="min-w-0 flex-1">
-                <span class="inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-indigo-100">
+                <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
                     {{ $pengguna->isAdmin() ? 'Administrator Sekolah' : 'Pendidik / Guru' }}
                 </span>
-                <h2 class="mt-1 truncate text-xl font-extrabold tracking-tight">{{ $pengguna->name }}</h2>
-                <p class="text-xs text-indigo-200">
+                <h2 class="mt-1 truncate text-lg font-bold text-slate-900">{{ $pengguna->name }}</h2>
+                <p class="text-xs text-slate-500">
                     {{ $pengguna->jabatan ?: 'Guru Mata Pelajaran' }}
                     @if ($pengguna->nip)
                         · NIP {{ $pengguna->nip }}
                     @endif
                 </p>
                 @if ($pengguna->quote)
-                    <p class="mt-2 text-xs italic text-indigo-100/90">“{{ $pengguna->quote }}”</p>
+                    <p class="mt-2 border-l-2 border-slate-200 pl-3 text-xs italic text-slate-500">“{{ $pengguna->quote }}”</p>
                 @endif
             </div>
         </div>
@@ -44,12 +44,12 @@
         <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="kartu p-6">
             @csrf @method('PATCH')
 
-            <h3 class="mb-4 text-base font-extrabold text-slate-800">Informasi Profil</h3>
+            <h3 class="mb-4 text-base font-bold text-slate-900">Informasi Profil</h3>
 
             <div class="space-y-4">
                 <x-bidang label="Ganti Foto Profil" nama="foto" petunjuk="JPG/PNG, maksimal 2 MB.">
                     <input type="file" name="foto" id="foto" accept="image/*"
-                           class="block w-full text-sm file:mr-3 file:rounded-xl file:border-0 file:bg-indigo-50 file:px-3.5 file:py-2 file:text-xs file:font-bold file:text-primary hover:file:bg-indigo-100">
+                           class="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3.5 file:py-2 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200">
                 </x-bidang>
 
                 <x-bidang label="Nama Lengkap & Gelar" nama="name" :wajib="true">
@@ -62,7 +62,7 @@
 
                 <x-bidang label="NIP" nama="nip_tampil" petunjuk="Hanya admin yang dapat mengubah NIP.">
                     <input type="text" value="{{ $pengguna->nip ?? '—' }}" disabled
-                           class="block w-full rounded-xl border-slate-200 bg-slate-50 text-sm text-slate-500">
+                           class="block w-full rounded-lg border-slate-200 bg-slate-50 text-sm text-slate-500">
                 </x-bidang>
 
                 <x-bidang label="Jabatan / Tugas Tambahan" nama="jabatan">
@@ -72,8 +72,8 @@
 
                 <x-bidang label="Kutipan Motivasi Beranda" nama="quote">
                     <textarea name="quote" id="quote" rows="3"
-                              placeholder="Kalimat inspiratif yang ingin Anda lihat setiap membuka portal…"
-                              class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">{{ old('quote', $pengguna->quote) }}</textarea>
+                              placeholder="Kalimat inspiratif yang ingin Anda lihat di beranda…"
+                              class="block w-full rounded-lg border-slate-200 text-sm focus:border-primary focus:ring-primary">{{ old('quote', $pengguna->quote) }}</textarea>
                 </x-bidang>
             </div>
 
@@ -83,7 +83,7 @@
         <form method="POST" action="{{ route('password.update') }}" class="kartu h-fit p-6">
             @csrf @method('PUT')
 
-            <h3 class="mb-4 text-base font-extrabold text-slate-800">Ganti Kata Sandi</h3>
+            <h3 class="mb-4 text-base font-bold text-slate-900">Ganti Kata Sandi</h3>
 
             <div class="space-y-4">
                 <x-bidang label="Kata Sandi Saat Ini" nama="current_password" :wajib="true">

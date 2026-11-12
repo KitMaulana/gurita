@@ -32,8 +32,8 @@
         </script>
     @endif
 </head>
-<body class="flex min-h-full items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-primary-800 p-4 font-sans antialiased">
-    <div class="w-full max-w-md rounded-2xl border border-white/15 bg-white p-6 shadow-2xl sm:p-8">
+<body class="flex min-h-full items-center justify-center bg-slate-50 p-4 font-sans text-slate-800 antialiased">
+    <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         {{ $slot }}
     </div>
 </body>

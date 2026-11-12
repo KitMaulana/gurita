@@ -55,26 +55,26 @@
                         </div>
                     </div>
                 </td>
-                <td class="px-4 py-3.5 text-sm font-semibold text-primary">{{ $materi->bab?->kode ?? '—' }}</td>
-                <td class="px-4 py-3.5">
-                    <span class="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">
+                <td class="px-4 py-3.5 whitespace-nowrap text-sm font-semibold text-primary">{{ $materi->bab?->kode ?? '—' }}</td>
+                <td class="px-4 py-3.5 whitespace-nowrap">
+                    <span class="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 whitespace-nowrap">
                         {{ ucfirst($materi->tipe) }}{{ $materi->ekstensi ? ' · '.strtoupper($materi->ekstensi) : '' }}
                     </span>
                 </td>
-                <td class="px-4 py-3.5 text-center text-xs font-semibold text-slate-500">{{ $materi->ukuran_terbaca }}</td>
-                <td class="px-4 py-3.5 text-center text-xs font-bold text-slate-600">{{ $materi->jumlah_unduh }}x</td>
-                <td class="px-4 py-3.5">
-                    <div class="flex justify-end items-center gap-1.5">
+                <td class="px-4 py-3.5 whitespace-nowrap text-center text-xs font-medium text-slate-500">{{ $materi->ukuran_terbaca }}</td>
+                <td class="px-4 py-3.5 whitespace-nowrap text-center text-xs font-semibold text-slate-600">{{ $materi->jumlah_unduh }}x</td>
+                <td class="px-4 py-3.5 whitespace-nowrap">
+                    <div class="flex justify-end items-center gap-1.5 flex-nowrap">
                         <a href="{{ route('materi.unduh', $materi) }}" title="Buka / Unduh"
-                           class="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 hover:border-primary-200 hover:bg-primary-50 hover:text-primary transition">
-                            <x-heroicon-o-arrow-down-tray class="h-4 w-4"/>
+                           class="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors whitespace-nowrap">
+                            <x-heroicon-o-arrow-down-tray class="h-4 w-4 shrink-0"/>
                             <span>Buka</span>
                         </a>
                         <form method="POST" action="{{ route('materi.destroy', $materi) }}"
                               onsubmit="return confirm('Hapus materi ini? Berkas ikut terhapus permanen.')">
                             @csrf @method('DELETE')
                             <button type="submit" title="Hapus"
-                                    class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-slate-200 bg-white p-1.5 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition">
+                                    class="inline-flex cursor-pointer items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 transition-colors">
                                 <x-heroicon-o-trash class="h-4 w-4"/>
                             </button>
                         </form>
