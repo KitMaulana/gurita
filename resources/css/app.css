@@ -2,22 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Gaya khusus Portal Admin Guru — lihat CLAUDE.md §11 */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        background-color: #f8fafc;
+        background-image:
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.06) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(20, 184, 166, 0.06) 0px, transparent 50%);
+        background-attachment: fixed;
+    }
+
+    /* Modern Form Controls */
+    input[type="text"],
+    input[type="email"],
+    input[type="url"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    input[type="search"],
+    select,
+    textarea {
+        @apply rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-sm transition-all duration-150 placeholder:text-slate-400 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        @apply cursor-pointer transition-all duration-150;
+    }
+}
+
+/* Gaya khusus Portal Admin Guru — Modern & Youthful Edition */
 @layer components {
     .kartu {
-        @apply rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200;
+        @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_2px_12px_-4px_rgba(15,23,42,0.06)] transition-all duration-200;
     }
 
     .kartu-hover:hover {
-        @apply -translate-y-1 shadow-lg;
+        @apply -translate-y-1 border-primary/30 shadow-[0_14px_28px_-8px_rgba(79,70,229,0.14)];
     }
 
     .nilai-merah {
-        @apply bg-red-50 text-red-700 font-semibold;
+        @apply bg-rose-50 text-rose-700 font-bold ring-1 ring-inset ring-rose-200;
     }
 
     .tombol-sentuh {
-        min-height: 44px;
-        min-width: 44px;
+        min-height: 42px;
+        min-width: 42px;
     }
+
+    .glass-panel {
+        @apply bg-white/85 backdrop-blur-md border border-white/60;
+    }
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

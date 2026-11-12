@@ -19,7 +19,7 @@
     .filter-presensi-card {
         background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         border: 1px solid #e2e8f0;
-        border-radius: 16px;
+        border-radius: 18px;
         padding: 18px 20px;
         box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.04);
     }
@@ -35,22 +35,21 @@
         align-items: center !important;
         justify-content: center !important;
         gap: 6px !important;
-        background-color: #1A365D !important;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
         color: #ffffff !important;
-        border: 1px solid #142B4A !important;
+        border: 1px solid #4338ca !important;
         border-radius: 11px !important;
         padding: 8px 14px !important;
         font-size: 12px !important;
         font-weight: 700 !important;
         line-height: 1.25 !important;
-        box-shadow: 0 2px 5px rgba(26, 54, 93, 0.2) !important;
+        box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25) !important;
         transition: all 0.18s ease !important;
         cursor: pointer;
     }
     .btn-filter-dark:hover {
-        background-color: #142B4A !important;
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(26, 54, 93, 0.28) !important;
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.35) !important;
     }
     .btn-filter-light {
         display: inline-flex !important;
@@ -93,12 +92,12 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
-        border-radius: 11px;
-        background: linear-gradient(135deg, #1A365D 0%, #2b548a 100%);
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
         color: #ffffff;
-        box-shadow: 0 3px 8px rgba(26, 54, 93, 0.22);
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
         flex-shrink: 0;
     }
 
@@ -141,13 +140,13 @@
         left: 0;
         right: 0;
         height: 5px;
-        background: var(--sesi-accent, #1A365D);
+        background: var(--sesi-accent, #4f46e5);
         transition: height 0.2s ease;
     }
     .sesi-card:hover {
         transform: translateY(-4px);
-        border-color: var(--sesi-accent, #94a3b8);
-        box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+        border-color: var(--sesi-accent, #6366f1);
+        box-shadow: 0 14px 28px -6px rgba(79, 70, 229, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
     }
     .sesi-card:hover .sesi-card-cta-arrow {
         transform: translateX(4px);
@@ -155,10 +154,10 @@
 
     /* Active Sesi Card */
     .sesi-card.is-active {
-        background: linear-gradient(135deg, #102542 0%, #1A365D 55%, #234b7e 100%) !important;
-        border-color: #1A365D !important;
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #4338ca 100%) !important;
+        border-color: #4f46e5 !important;
         color: #ffffff !important;
-        box-shadow: 0 16px 32px -8px rgba(26, 54, 93, 0.42), 0 0 0 2px var(--sesi-accent, #3b82f6) !important;
+        box-shadow: 0 16px 32px -8px rgba(49, 46, 129, 0.45), 0 0 0 2px var(--sesi-accent, #818cf8) !important;
         transform: translateY(-2px);
     }
     .sesi-card.is-active::before {
@@ -219,14 +218,14 @@
         justify-content: center !important;
         text-align: center !important;
         line-height: 1 !important;
-        min-width: 2.25rem !important;
-        height: 2rem !important;
+        min-width: 2.35rem !important;
+        height: 2.1rem !important;
         cursor: pointer;
         user-select: none;
-        border-radius: 0.5rem;
+        border-radius: 0.6rem;
         padding: 0 0.5rem;
         font-size: 0.75rem;
-        font-weight: 700;
+        font-weight: 800;
         transition: all 0.15s ease-in-out;
         background-color: #ffffff;
         color: #334155;
@@ -290,6 +289,10 @@
 window.formPresensi = function(dataAwal, totalSiswa) {
     return {
         siswaStatus: dataAwal || {},
+        totalSiswa: totalSiswa || 0,
+        cariSiswa: '',
+        filterStatus: 'semua',
+        tampilPanduan: false,
         hadirCount: 0,
         sakitCount: 0,
         izinCount: 0,
@@ -314,6 +317,10 @@ window.formPresensi = function(dataAwal, totalSiswa) {
             this.alfaCount = a;
             this.dispensasiCount = d;
         },
+        persenHadir() {
+            if (!this.totalSiswa) return 100;
+            return Math.round(((this.hadirCount + this.dispensasiCount) / this.totalSiswa) * 100);
+        },
         getStatus(id) {
             return (this.siswaStatus[id] && this.siswaStatus[id].status) ? this.siswaStatus[id].status : 'hadir';
         },
@@ -324,6 +331,22 @@ window.formPresensi = function(dataAwal, totalSiswa) {
             this.siswaStatus[id].status = status;
             this.siswaStatus = Object.assign({}, this.siswaStatus);
             this.hitung();
+        },
+        setKeterangan(id, teks) {
+            if (!this.siswaStatus[id]) {
+                this.siswaStatus[id] = { status: 'hadir', keterangan: '' };
+            }
+            this.siswaStatus[id].keterangan = teks;
+            this.siswaStatus = Object.assign({}, this.siswaStatus);
+        },
+        cocokFilter(id, nama, nisn) {
+            const st = this.getStatus(id);
+            if (this.filterStatus === 'tidak_hadir' && st === 'hadir') {
+                return false;
+            }
+            const q = (this.cariSiswa || '').trim().toLowerCase();
+            if (!q) return true;
+            return (nama && nama.toLowerCase().includes(q)) || (nisn && nisn.toLowerCase().includes(q));
         },
         toggleHadir(id, checked) {
             this.setStatus(id, checked ? 'hadir' : 'alfa');
@@ -371,7 +394,7 @@ document.addEventListener('alpine:init', () => {
 
 @section('konten')
     <x-kepala-halaman judul="Presensi Siswa"
-                      keterangan="Input kehadiran siswa secara cepat & pantau rekap pertemuan.">
+                      keterangan="Input kehadiran siswa secara cepat, cari nama siswa instan, & pantau rekap pertemuan.">
         <x-slot:aksi>
             <x-tombol gaya="garis" ikon="chart-bar" :href="route('presensi.rekap')">Rekap Kehadiran</x-tombol>
         </x-slot:aksi>
@@ -387,35 +410,37 @@ document.addEventListener('alpine:init', () => {
             window.history.replaceState({}, '', u.toString());
         }
     }">
-        {{-- Tab Navigasi --}}
-        <div class="mb-6 flex border-b border-slate-200">
+        {{-- Tab Navigasi Modern Pill --}}
+        <div class="mb-6 inline-flex flex-wrap items-center gap-1.5 rounded-2xl bg-white p-1.5 shadow-xs border border-slate-200/80">
             <button type="button" @click="pilihTab('input')"
-                    class="flex cursor-pointer items-center gap-2 border-b-2 px-5 py-3 text-sm font-bold transition"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all"
                     :class="tab === 'input'
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'">
+                        ? 'bg-primary text-white shadow-sm shadow-primary/25'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'">
                 <x-heroicon-o-pencil-square class="h-4 w-4"/>
                 <span>Input Presensi Langsung</span>
                 @if ($sesiMapel->isNotEmpty())
-                    <span class="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                    <span class="rounded-full px-2 py-0.5 text-[11px] font-extrabold"
+                          :class="tab === 'input' ? 'bg-white/20 text-white' : 'bg-primary-50 text-primary'">
                         {{ $sesiMapel->count() }} Sesi
                     </span>
                 @endif
             </button>
             <button type="button" @click="pilihTab('riwayat')"
-                    class="flex cursor-pointer items-center gap-2 border-b-2 px-5 py-3 text-sm font-bold transition"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all"
                     :class="tab === 'riwayat'
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'">
+                        ? 'bg-primary text-white shadow-sm shadow-primary/25'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'">
                 <x-heroicon-o-clock class="h-4 w-4"/>
                 <span>Riwayat Pertemuan</span>
-                <span class="ml-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                <span class="rounded-full px-2 py-0.5 text-[11px] font-extrabold"
+                      :class="tab === 'riwayat' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'">
                     {{ $daftar->total() }}
                 </span>
             </button>
         </div>
 
-        {{-- TAB 1: INPUT PRESENSI LANGSUNG (ALA ABSENSI-SISWA) --}}
+        {{-- TAB 1: INPUT PRESENSI LANGSUNG --}}
         <div x-show="tab === 'input'" x-cloak class="space-y-6">
         {{-- Card Filter Tanggal & Pilihan Kelas --}}
         <div class="filter-presensi-card">
@@ -702,7 +727,7 @@ document.addEventListener('alpine:init', () => {
                     <input type="hidden" name="sesi_id" value="{{ $sesiAktifId }}">
 
                     {{-- Card Info Sesi & Materi --}}
-                    <div class="kartu mb-4 p-4 sm:p-5" style="border-left: 5px solid {{ $warnaAktifK['accent'] }}; border-radius: 16px;">
+                    <div class="kartu mb-4 p-4 sm:p-5" style="border-left: 5px solid {{ $warnaAktifK['accent'] }};">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
                             <div>
                                 <div class="flex flex-wrap items-center gap-2">
@@ -732,21 +757,28 @@ document.addEventListener('alpine:init', () => {
                                 </p>
                             </div>
 
-                            @if ($agendaAktif)
-                                <div class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 border border-emerald-200">
-                                    <x-heroicon-s-check-circle class="h-4 w-4 text-emerald-600"/>
-                                    <span>Pertemuan ke-{{ $agendaAktif->pertemuan_ke }}</span>
-                                </div>
-                            @else
-                                <div class="inline-flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800 border border-amber-200">
-                                    <x-heroicon-o-sparkles class="h-4 w-4 text-amber-600"/>
-                                    <span>Pertemuan Baru</span>
-                                </div>
-                            @endif
+                            <div class="flex items-center gap-2">
+                                <button type="button" @click="tampilPanduan = !tampilPanduan"
+                                        class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                                    <x-heroicon-o-information-circle class="h-4 w-4 text-primary"/>
+                                    <span x-text="tampilPanduan ? 'Tutup Info Kode' : 'Info Kode Status'"></span>
+                                </button>
+                                @if ($agendaAktif)
+                                    <div class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 border border-emerald-200">
+                                        <x-heroicon-s-check-circle class="h-4 w-4 text-emerald-600"/>
+                                        <span>Pertemuan ke-{{ $agendaAktif->pertemuan_ke }}</span>
+                                    </div>
+                                @else
+                                    <div class="inline-flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-800 border border-amber-200">
+                                        <x-heroicon-o-sparkles class="h-4 w-4 text-amber-600"/>
+                                        <span>Pertemuan Baru</span>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                         {{-- Isian Materi Pertemuan (Praktis, auto-create di agenda) --}}
-                        <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl bg-slate-50 p-3 border border-slate-200">
+                        <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-xl bg-slate-50/90 p-3.5 border border-slate-200/80">
                             <label for="judul_materi" class="flex items-center gap-1.5 text-xs font-bold text-slate-700 shrink-0">
                                 <x-heroicon-o-book-open class="h-4 w-4 text-primary"/>
                                 <span>Materi / Topik Pertemuan:</span>
@@ -754,101 +786,136 @@ document.addEventListener('alpine:init', () => {
                             <input type="text" id="judul_materi" name="judul_materi"
                                    value="{{ old('judul_materi', $agendaAktif?->judul_materi ?? 'Pembelajaran Tatap Muka') }}"
                                    placeholder="Contoh: Teks Eksplanasi, Latihan Soal Bab 2, dll."
-                                   style="border-radius: 10px; padding: 7px 12px;"
-                                   class="w-full sm:max-w-md border-slate-300 bg-white text-sm font-medium text-slate-800 shadow-sm focus:border-primary focus:ring-primary">
+                                   class="w-full sm:max-w-md rounded-xl border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-2xs focus:border-primary focus:ring-primary">
                             <span class="text-xs text-slate-500 italic">
-                                *Agenda mengajar tercatat otomatis saat presensi disimpan
+                                ✨ Agenda mengajar tercatat otomatis saat presensi disimpan
                             </span>
                         </div>
                     </div>
 
-                    {{-- Panduan / Keterangan Singkatan Status (Permintaan User) --}}
-                    <div class="kartu mb-4 p-4 bg-white border-slate-200 shadow-sm">
-                        <div class="flex items-center gap-2 mb-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">
-                            <x-heroicon-o-information-circle class="h-4 w-4 text-primary"/>
-                            <span>Keterangan Pilihan Status Kehadiran:</span>
+                    {{-- Panduan / Keterangan Singkatan Status (Collapsible agar hemat ruang) --}}
+                    <div x-show="tampilPanduan" x-cloak x-transition class="kartu mb-4 p-4 bg-white border-slate-200 shadow-xs">
+                        <div class="flex items-center justify-between gap-2 mb-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">
+                            <div class="flex items-center gap-2">
+                                <x-heroicon-o-information-circle class="h-4 w-4 text-primary"/>
+                                <span>Keterangan Pilihan Status Kehadiran:</span>
+                            </div>
+                            <button type="button" @click="tampilPanduan = false" class="text-slate-400 hover:text-slate-600">✕</button>
                         </div>
                         <div class="status-legend-grid text-xs">
-                            <div class="status-legend-card" style="background-color: #ecfdf5; border: 1px solid #a7f3d0; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;">
-                                <span class="status-legend-badge" style="background-color: #059669; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 10px; font-weight: 900; font-size: 15px; line-height: 1; text-align: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(5,150,105,0.25);">H</span>
-                                <div style="min-width: 0; flex: 1;">
+                            <div class="status-legend-card" style="background-color: #ecfdf5; border: 1px solid #a7f3d0;">
+                                <span class="status-legend-badge" style="background-color: #059669;">H</span>
+                                <div class="min-w-0 flex-1">
                                     <p class="font-bold leading-tight text-sm" style="color: #065f46;">Hadir</p>
-                                    <p class="text-[11px] truncate" style="color: #047857; margin-top: 2px;">Masuk pelajaran</p>
+                                    <p class="text-[11px] truncate" style="color: #047857;">Masuk pelajaran</p>
                                 </div>
                             </div>
-                            <div class="status-legend-card" style="background-color: #fffbeb; border: 1px solid #fde68a; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;">
-                                <span class="status-legend-badge" style="background-color: #d97706; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 10px; font-weight: 900; font-size: 15px; line-height: 1; text-align: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(217,119,6,0.25);">S</span>
-                                <div style="min-width: 0; flex: 1;">
+                            <div class="status-legend-card" style="background-color: #fffbeb; border: 1px solid #fde68a;">
+                                <span class="status-legend-badge" style="background-color: #d97706;">S</span>
+                                <div class="min-w-0 flex-1">
                                     <p class="font-bold leading-tight text-sm" style="color: #92400e;">Sakit</p>
-                                    <p class="text-[11px] truncate" style="color: #b45309; margin-top: 2px;">Kondisi sakit</p>
+                                    <p class="text-[11px] truncate" style="color: #b45309;">Kondisi sakit</p>
                                 </div>
                             </div>
-                            <div class="status-legend-card" style="background-color: #f0f9ff; border: 1px solid #bae6fd; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;">
-                                <span class="status-legend-badge" style="background-color: #0284c7; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 10px; font-weight: 900; font-size: 15px; line-height: 1; text-align: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(2,132,199,0.25);">I</span>
-                                <div style="min-width: 0; flex: 1;">
+                            <div class="status-legend-card" style="background-color: #f0f9ff; border: 1px solid #bae6fd;">
+                                <span class="status-legend-badge" style="background-color: #0284c7;">I</span>
+                                <div class="min-w-0 flex-1">
                                     <p class="font-bold leading-tight text-sm" style="color: #075985;">Izin</p>
-                                    <p class="text-[11px] truncate" style="color: #0369a1; margin-top: 2px;">Izin keperluan</p>
+                                    <p class="text-[11px] truncate" style="color: #0369a1;">Izin keperluan</p>
                                 </div>
                             </div>
-                            <div class="status-legend-card" style="background-color: #fff1f2; border: 1px solid #fecdd3; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;">
-                                <span class="status-legend-badge" style="background-color: #e11d48; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 10px; font-weight: 900; font-size: 15px; line-height: 1; text-align: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(225,29,72,0.25);">A</span>
-                                <div style="min-width: 0; flex: 1;">
+                            <div class="status-legend-card" style="background-color: #fff1f2; border: 1px solid #fecdd3;">
+                                <span class="status-legend-badge" style="background-color: #e11d48;">A</span>
+                                <div class="min-w-0 flex-1">
                                     <p class="font-bold leading-tight text-sm" style="color: #9f1239;">Alfa</p>
-                                    <p class="text-[11px] truncate" style="color: #be123c; margin-top: 2px;">Tanpa keterangan</p>
+                                    <p class="text-[11px] truncate" style="color: #be123c;">Tanpa keterangan</p>
                                 </div>
                             </div>
-                            <div class="status-legend-card" style="background-color: #fef2f2; border: 1px solid #fca5a5; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;">
-                                <span class="status-legend-badge" style="background-color: #dc2626; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 10px; font-weight: 900; font-size: 15px; line-height: 1; text-align: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(220,38,38,0.25);">B</span>
-                                <div style="min-width: 0; flex: 1;">
+                            <div class="status-legend-card" style="background-color: #fef2f2; border: 1px solid #fca5a5;">
+                                <span class="status-legend-badge" style="background-color: #dc2626;">B</span>
+                                <div class="min-w-0 flex-1">
                                     <p class="font-bold leading-tight text-sm" style="color: #991b1b;">Bolos</p>
-                                    <p class="text-[11px] truncate" style="color: #b91c1c; margin-top: 2px;">Meninggalkan jam</p>
+                                    <p class="text-[11px] truncate" style="color: #b91c1c;">Meninggalkan jam</p>
                                 </div>
                             </div>
-                            <div class="status-legend-card" style="background-color: #f5f3ff; border: 1px solid #ddd6fe; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px;">
-                                <span class="status-legend-badge" style="background-color: #7c3aed; color: #ffffff; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; min-width: 36px; min-height: 36px; border-radius: 10px; font-weight: 900; font-size: 15px; line-height: 1; text-align: center; flex-shrink: 0; box-shadow: 0 2px 4px rgba(124,58,237,0.25);">D</span>
-                                <div style="min-width: 0; flex: 1;">
+                            <div class="status-legend-card" style="background-color: #f5f3ff; border: 1px solid #ddd6fe;">
+                                <span class="status-legend-badge" style="background-color: #7c3aed;">D</span>
+                                <div class="min-w-0 flex-1">
                                     <p class="font-bold leading-tight text-sm" style="color: #5b21b6;">Dispensasi</p>
-                                    <p class="text-[11px] truncate" style="color: #6d28d9; margin-top: 2px;">Tugas sekolah</p>
+                                    <p class="text-[11px] truncate" style="color: #6d28d9;">Tugas sekolah</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Toolbar Ringkasan & Aksi Cepat --}}
-                    <div class="kartu mb-4 p-4 flex flex-wrap items-center justify-between gap-3 bg-slate-50/80">
-                        {{-- Live Counter Chips --}}
-                        <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
-                            <span class="inline-flex items-center gap-1 rounded-xl px-3 py-1.5 shadow-xs" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;">
-                                Hadir: <strong class="tabular-nums text-sm font-black" x-text="hadirCount"></strong> / {{ $siswas->count() }}
-                            </span>
-                            <span x-show="sakitCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-xs" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
-                                Sakit: <strong class="tabular-nums font-black" x-text="sakitCount"></strong>
-                            </span>
-                            <span x-show="izinCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-xs" style="background-color: #e0f2fe; color: #075985; border: 1px solid #bae6fd;">
-                                Izin: <strong class="tabular-nums font-black" x-text="izinCount"></strong>
-                            </span>
-                            <span x-show="alfaCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-xs" style="background-color: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3;">
-                                Alfa: <strong class="tabular-nums font-black" x-text="alfaCount"></strong>
-                            </span>
-                            <span x-show="dispensasiCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-xs" style="background-color: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe;">
-                                Dispensasi: <strong class="tabular-nums font-black" x-text="dispensasiCount"></strong>
-                            </span>
+                    {{-- Toolbar Ringkasan, Pencarian Siswa Instan & Aksi Cepat --}}
+                    <div class="kartu mb-4 p-4 space-y-3 bg-white">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            {{-- Live Counter Chips --}}
+                            <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+                                <span class="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 shadow-2xs" style="background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;">
+                                    <span>Hadir:</span>
+                                    <strong class="tabular-nums text-sm font-black" x-text="hadirCount"></strong>
+                                    <span>/ {{ $siswas->count() }}</span>
+                                    <span class="ml-1 rounded-md bg-emerald-700/15 px-1.5 py-0.5 text-[10px] font-black" x-text="persenHadir() + '%'"></span>
+                                </span>
+                                <span x-show="sakitCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-2xs" style="background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+                                    Sakit: <strong class="tabular-nums font-black" x-text="sakitCount"></strong>
+                                </span>
+                                <span x-show="izinCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-2xs" style="background-color: #e0f2fe; color: #075985; border: 1px solid #bae6fd;">
+                                    Izin: <strong class="tabular-nums font-black" x-text="izinCount"></strong>
+                                </span>
+                                <span x-show="alfaCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-2xs" style="background-color: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3;">
+                                    Alfa/Bolos: <strong class="tabular-nums font-black" x-text="alfaCount"></strong>
+                                </span>
+                                <span x-show="dispensasiCount > 0" x-cloak class="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 shadow-2xs" style="background-color: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe;">
+                                    Dispensasi: <strong class="tabular-nums font-black" x-text="dispensasiCount"></strong>
+                                </span>
+                            </div>
+
+                            {{-- Tombol Aksi Cepat --}}
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button type="button" @click="tandaiSemuaHadir()"
+                                        style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;"
+                                        class="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-2xs hover:brightness-95 transition active:scale-95">
+                                    <x-heroicon-o-check-circle class="h-4 w-4 shrink-0" style="color: #059669;"/>
+                                    <span>Tandai Semua Hadir</span>
+                                </button>
+                                <button type="button" @click="batalTandaiSemua()"
+                                        style="background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;"
+                                        class="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-2xs hover:brightness-95 transition active:scale-95">
+                                    <x-heroicon-o-x-circle class="h-4 w-4 shrink-0" style="color: #e11d48;"/>
+                                    <span>Batal Tandai Semua</span>
+                                </button>
+                            </div>
                         </div>
 
-                        {{-- Tombol Aksi Cepat --}}
-                        <div class="flex items-center gap-2">
-                            <button type="button" @click="tandaiSemuaHadir()"
-                                    style="background-color: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0;"
-                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-sm hover:brightness-95 transition active:scale-95">
-                                <x-heroicon-o-check-circle class="h-4 w-4 shrink-0" style="color: #059669;"/>
-                                <span>Tandai Semua Hadir</span>
-                            </button>
-                            <button type="button" @click="batalTandaiSemua()"
-                                    style="background-color: #fff1f2; color: #9f1239; border: 1px solid #fecdd3;"
-                                    class="inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shadow-sm hover:brightness-95 transition active:scale-95">
-                                <x-heroicon-o-x-circle class="h-4 w-4 shrink-0" style="color: #e11d48;"/>
-                                <span>Batal Tandai Semua</span>
-                            </button>
+                        {{-- Baris Pencarian Siswa & Filter Status --}}
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-2.5 border-t border-slate-100">
+                            <div class="relative flex-1 max-w-md">
+                                <x-heroicon-o-magnifying-glass class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"/>
+                                <input type="text" x-model="cariSiswa"
+                                       placeholder="Cari cepat nama siswa atau NISN..."
+                                       class="w-full rounded-xl border-slate-200 bg-slate-50/70 pl-9 pr-8 py-2 text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-primary focus:ring-primary">
+                                <button type="button" x-show="cariSiswa.length > 0" x-cloak @click="cariSiswa = ''"
+                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-600">
+                                    ✕
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Filter:</span>
+                                <button type="button" @click="filterStatus = 'semua'"
+                                        class="rounded-xl px-3 py-1.5 text-xs font-bold transition"
+                                        :class="filterStatus === 'semua' ? 'bg-primary text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'">
+                                    Semua ({{ $siswas->count() }})
+                                </button>
+                                <button type="button" @click="filterStatus = 'tidak_hadir'"
+                                        class="rounded-xl px-3 py-1.5 text-xs font-bold transition"
+                                        :class="filterStatus === 'tidak_hadir' ? 'bg-amber-500 text-white shadow-2xs' : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'">
+                                    Tidak Hadir Saja (<span x-text="sakitCount + izinCount + alfaCount + dispensasiCount"></span>)
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -856,22 +923,23 @@ document.addEventListener('alpine:init', () => {
                     <div class="kartu overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-slate-100 text-xs">
-                                <thead class="bg-slate-50/80 text-left uppercase tracking-wider text-slate-500 font-bold">
+                                <thead class="bg-slate-50/90 text-left uppercase tracking-wider text-slate-500 font-extrabold">
                                     <tr>
-                                        <th class="w-12 px-4 py-3 text-center">No</th>
-                                        <th class="px-4 py-3">Nama Siswa</th>
-                                        <th class="w-24 px-4 py-3 text-center">Hadir</th>
-                                        <th class="px-4 py-3">Pilihan Status</th>
-                                        <th class="px-4 py-3">Keterangan (Opsional)</th>
+                                        <th class="w-12 px-4 py-3.5 text-center">No</th>
+                                        <th class="px-4 py-3.5">Nama Siswa</th>
+                                        <th class="w-24 px-4 py-3.5 text-center">Hadir</th>
+                                        <th class="px-4 py-3.5">Pilihan Status</th>
+                                        <th class="px-4 py-3.5">Keterangan & Klik Cepat</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     @foreach ($siswas as $s)
-                                        <tr class="hover:bg-slate-50/60 transition"
-                                            :class="getStatus({{ $s->id }}) !== 'hadir' ? 'bg-amber-50/30' : ''">
+                                        <tr x-show="cocokFilter({{ $s->id }}, {{ Js::from($s->nama) }}, {{ Js::from($s->nisn ?? '') }})"
+                                            class="hover:bg-indigo-50/25 transition"
+                                            :class="getStatus({{ $s->id }}) !== 'hadir' ? 'bg-amber-50/35' : ''">
                                             {{-- No. Absen --}}
                                             <td class="px-4 py-3 text-center">
-                                                <div class="mx-auto grid h-8 w-8 place-items-center rounded-lg bg-slate-100 text-xs font-bold text-slate-700">
+                                                <div class="mx-auto grid h-8 w-8 place-items-center rounded-xl bg-slate-100 text-xs font-extrabold text-slate-700">
                                                     {{ $s->pivot->no_absen ?? $loop->iteration }}
                                                 </div>
                                             </td>
@@ -911,12 +979,21 @@ document.addEventListener('alpine:init', () => {
                                                 </div>
                                             </td>
 
-                                            {{-- Input Keterangan --}}
+                                            {{-- Input Keterangan + Quick Chips --}}
                                             <td class="px-4 py-3">
                                                 <input type="text" name="keterangan[{{ $s->id }}]"
                                                        x-model="siswaStatus[{{ $s->id }}].keterangan"
-                                                       placeholder="Keterangan (opsional)"
-                                                       class="w-full min-w-[12rem] rounded-xl border-slate-200 text-xs shadow-sm placeholder:text-slate-400 focus:border-primary focus:ring-primary">
+                                                       :placeholder="getStatus({{ $s->id }}) === 'hadir' ? 'Keterangan (opsional)' : 'Alasan ketidakhadiran...'"
+                                                       class="w-full min-w-[13rem] rounded-xl border-slate-200 text-xs shadow-2xs placeholder:text-slate-400 focus:border-primary focus:ring-primary">
+                                                <div x-show="getStatus({{ $s->id }}) !== 'hadir'" x-cloak class="mt-1.5 flex flex-wrap gap-1">
+                                                    @foreach (['Sakit demam', 'Surat dokter', 'Izin keluarga', 'Lomba / OSIS', 'Tanpa kabar'] as $alasan)
+                                                        <button type="button"
+                                                                @click="setKeterangan({{ $s->id }}, '{{ $alasan }}')"
+                                                                class="rounded-md border border-amber-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-amber-900 hover:bg-amber-100 transition">
+                                                            + {{ $alasan }}
+                                                        </button>
+                                                    @endforeach
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -925,13 +1002,13 @@ document.addEventListener('alpine:init', () => {
                         </div>
 
                         {{-- Footer Simpan Presensi --}}
-                        <div class="sticky bottom-0 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur rounded-b-xl shadow-lg">
+                        <div class="sticky bottom-0 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-200 bg-white/95 px-5 py-4 backdrop-blur rounded-b-2xl shadow-lg">
                             <div class="text-xs text-slate-500 text-center sm:text-left">
                                 Pastikan kehadiran telah sesuai sebelum menekan tombol simpan.
                             </div>
                             <div class="flex items-center gap-2">
                                 <button type="submit"
-                                        class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-primary-700 transition active:scale-95">
+                                        class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-indigo-500 px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:from-primary-700 hover:to-primary transition active:scale-95">
                                     <x-heroicon-o-check class="h-4 w-4"/>
                                     <span>Simpan Presensi {{ $kelasAktif->nama }}</span>
                                 </button>
@@ -965,37 +1042,39 @@ document.addEventListener('alpine:init', () => {
         <x-tabel>
             <x-slot:kepala>
                 <tr>
-                    <th class="px-4 py-3">Tanggal</th>
-                    <th class="px-4 py-3">Kelas / Mapel</th>
-                    <th class="px-4 py-3">Materi</th>
-                    <th class="px-4 py-3">Rekap</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
+                    <th class="px-4 py-3.5">Tanggal</th>
+                    <th class="px-4 py-3.5">Kelas / Mapel</th>
+                    <th class="px-4 py-3.5">Materi</th>
+                    <th class="px-4 py-3.5">Rekap</th>
+                    <th class="px-4 py-3.5 text-right">Aksi</th>
                 </tr>
             </x-slot:kepala>
 
             @forelse ($daftar as $agenda)
-                <tr class="hover:bg-slate-50">
-                    <td class="whitespace-nowrap px-4 py-3">
-                        <p class="font-semibold text-slate-800">{{ Tanggal::angka($agenda->tanggal) }}</p>
+                <tr class="hover:bg-indigo-50/30 transition">
+                    <td class="whitespace-nowrap px-4 py-3.5">
+                        <p class="font-bold text-slate-800">{{ Tanggal::angka($agenda->tanggal) }}</p>
                         <p class="text-xs text-slate-500">Pertemuan ke-{{ $agenda->pertemuan_ke }}</p>
                     </td>
-                    <td class="px-4 py-3">
-                        <p class="font-medium text-slate-800">{{ $agenda->jadwal?->kelas_tampilan ?? '—' }}</p>
+                    <td class="px-4 py-3.5">
+                        <p class="font-bold text-slate-800">{{ $agenda->jadwal?->kelas_tampilan ?? '—' }}</p>
                         <p class="text-xs text-slate-500">{{ $agenda->jadwal?->nama_tampilan ?? '—' }}</p>
                     </td>
-                    <td class="px-4 py-3 text-slate-700">{{ $agenda->judul_materi }}</td>
-                    <td class="px-4 py-3">
+                    <td class="px-4 py-3.5 font-medium text-slate-700">{{ $agenda->judul_materi }}</td>
+                    <td class="px-4 py-3.5">
                         @if ($agenda->presensis_count > 0)
-                            <div class="flex flex-wrap gap-1 text-xs font-semibold">
-                                <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">H {{ $agenda->jumlah_hadir }}</span>
-                                <span class="rounded-full bg-rose-100 px-2 py-0.5 text-rose-800">A {{ $agenda->jumlah_alfa }}</span>
-                                <span class="text-slate-400">dari {{ $agenda->presensis_count }}</span>
+                            <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold">
+                                <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-emerald-800">H: {{ $agenda->jumlah_hadir }}</span>
+                                @if ($agenda->jumlah_alfa > 0)
+                                    <span class="rounded-full bg-rose-100 px-2.5 py-0.5 text-rose-800">A: {{ $agenda->jumlah_alfa }}</span>
+                                @endif
+                                <span class="text-slate-400 font-medium">dari {{ $agenda->presensis_count }}</span>
                             </div>
                         @else
-                            <span class="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-600">Belum diisi</span>
+                            <span class="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-bold text-rose-600 ring-1 ring-rose-200">Belum diisi</span>
                         @endif
                     </td>
-                    <td class="px-4 py-3 text-right">
+                    <td class="px-4 py-3.5 text-right">
                         <x-tombol gaya="{{ $agenda->presensis_count ? 'garis' : 'aksen' }}"
                                   :href="route('presensi.isi', $agenda)"
                                   ikon="{{ $agenda->presensis_count ? 'eye' : 'pencil-square' }}">
@@ -1017,10 +1096,8 @@ document.addEventListener('alpine:init', () => {
 
 @push('skrip')
 <script>
-// Pastikan skrip terdaftar dan terintegrasi dengan Livewire / Alpine jika dibutuhkan
 if (window.Alpine && window.formPresensi) {
     window.Alpine.data('formPresensi', window.formPresensi);
 }
 </script>
 @endpush
-

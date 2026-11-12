@@ -6,46 +6,122 @@
     use Illuminate\Support\Str;
 @endphp
 
+@push('kepala')
+<style>
+    .sesi-section-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .sesi-section-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sesi-section-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);
+        flex-shrink: 0;
+    }
+    .sesi-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 16px;
+    }
+    @media (min-width: 640px) {
+        .sesi-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+        .sesi-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .sesi-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-radius: 18px;
+        background-color: #ffffff;
+        border: 1.5px solid #e2e8f0;
+        padding: 18px 18px 14px 18px;
+        text-decoration: none !important;
+        overflow: hidden;
+        transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.06);
+    }
+    .sesi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--sesi-accent, #4f46e5);
+    }
+    .sesi-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--sesi-accent, #6366f1);
+        box-shadow: 0 14px 28px -6px rgba(79, 70, 229, 0.14);
+    }
+    .sesi-card.is-active {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 55%, #4338ca 100%) !important;
+        border-color: #4f46e5 !important;
+        color: #ffffff !important;
+        box-shadow: 0 16px 32px -8px rgba(49, 46, 129, 0.45), 0 0 0 2px var(--sesi-accent, #818cf8) !important;
+        transform: translateY(-2px);
+    }
+</style>
+@endpush
+
 @section('konten')
     <x-kepala-halaman judul="Isi Agenda Mengajar"
-                      keterangan="Pilih sesi kelas sesuai jadwal Anda, lalu catat agenda pembelajaran per kelas.">
+                      keterangan="Pilih sesi kelas sesuai jadwal Anda, lalu catat agenda pembelajaran per kelas dengan cepat.">
         <x-slot:aksi>
-            <x-tombol gaya="halus" ikon="arrow-left" :href="route('agenda.index')">Daftar Agenda</x-tombol>
+            <x-tombol gaya="garis" ikon="arrow-left" :href="route('agenda.index')">Daftar Agenda</x-tombol>
         </x-slot:aksi>
     </x-kepala-halaman>
 
     {{-- Filter & Navigasi Tanggal --}}
-    <div class="kartu mb-6 p-4 sm:p-5" style="border-radius: 16px;">
+    <div class="kartu mb-6 p-4 sm:p-5">
         <form method="GET" action="{{ route('agenda.dari-jadwal') }}" class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex flex-wrap items-center gap-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tanggal Pertemuan:</span>
+                <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500">Tanggal Pertemuan:</span>
                 <input type="date" name="tanggal" value="{{ $tanggal->toDateString() }}" onchange="this.form.submit()"
-                       style="border-radius: 11px; padding: 7px 12px; font-weight: 600;"
-                       class="border-slate-300 text-sm text-slate-800 shadow-sm focus:border-primary focus:ring-primary">
-                <button type="submit" class="btn-filter-dark">
+                       class="rounded-xl border-slate-200 px-3 py-2 text-sm font-bold text-slate-800 shadow-xs focus:border-primary focus:ring-primary">
+                <button type="submit"
+                        class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-700 transition">
                     <x-heroicon-o-magnifying-glass class="h-3.5 w-3.5"/>
                     <span>Tampilkan</span>
                 </button>
                 <a href="{{ route('agenda.dari-jadwal', ['tanggal' => today()->toDateString()]) }}"
-                   class="btn-filter-light">
+                   class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition">
                     Hari Ini
                 </a>
                 <div class="flex items-center gap-1">
                     <a href="{{ route('agenda.dari-jadwal', ['tanggal' => $tanggal->copy()->subDay()->toDateString()]) }}"
                        title="Hari Sebelumnya"
-                       class="btn-filter-light" style="padding: 8px 9px !important;">
+                       class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-xs hover:bg-slate-50 transition">
                         <x-heroicon-o-chevron-left class="h-4 w-4"/>
                     </a>
                     <a href="{{ route('agenda.dari-jadwal', ['tanggal' => $tanggal->copy()->addDay()->toDateString()]) }}"
                        title="Hari Berikutnya"
-                       class="btn-filter-light" style="padding: 8px 9px !important;">
+                       class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600 shadow-xs hover:bg-slate-50 transition">
                         <x-heroicon-o-chevron-right class="h-4 w-4"/>
                     </a>
                 </div>
             </div>
 
             <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
-                <span class="inline-flex items-center justify-center rounded-lg bg-primary/10 p-1 text-primary">
+                <span class="inline-flex items-center justify-center rounded-xl bg-primary-50 p-1.5 text-primary ring-1 ring-primary-100">
                     <x-heroicon-o-calendar class="h-4 w-4"/>
                 </span>
                 <span>Hari <strong class="text-slate-900">{{ $hari?->label() ?? '—' }}</strong>, {{ Tanggal::lengkap($tanggal) }}</span>
@@ -60,15 +136,19 @@
 
     @if (! $hari)
         <div class="kartu p-10 text-center">
-            <x-heroicon-o-face-smile class="mx-auto h-12 w-12 text-slate-300"/>
-            <p class="mt-3 font-semibold text-slate-700">Tanggal yang dipilih jatuh pada hari Minggu</p>
-            <p class="text-sm text-slate-500">Tidak ada jadwal mengajar pada hari Minggu.</p>
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50 text-primary">
+                <x-heroicon-o-face-smile class="h-9 w-9"/>
+            </div>
+            <p class="mt-4 font-extrabold text-slate-800">Tanggal yang dipilih jatuh pada hari Minggu</p>
+            <p class="mt-1 text-sm text-slate-500">Tidak ada jadwal mengajar pada hari Minggu. Selamat beristirahat!</p>
         </div>
     @elseif ($sesiList->isEmpty())
         <div class="kartu p-10 text-center">
-            <x-heroicon-o-calendar-days class="mx-auto h-12 w-12 text-slate-300"/>
-            <p class="mt-3 font-semibold text-slate-700">Tidak ada jadwal mengajar pada hari {{ $hari->label() }}</p>
-            <p class="text-sm text-slate-500">Silakan pilih tanggal lain yang memiliki jadwal mengajar.</p>
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+                <x-heroicon-o-calendar-days class="h-9 w-9"/>
+            </div>
+            <p class="mt-4 font-extrabold text-slate-800">Tidak ada jadwal mengajar pada hari {{ $hari->label() }}</p>
+            <p class="mt-1 text-sm text-slate-500">Silakan pilih tanggal lain yang memiliki jadwal mengajar.</p>
         </div>
     @else
         {{-- 1. DAFTAR SESI JADWAL HARIAN (PILIH KELAS) --}}
@@ -80,14 +160,14 @@
                     </span>
                     <div>
                         <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-800" style="line-height: 1.2;">
-                            Sesi Pelajaran Hari {{ $hari->label() }} — Pilih Kelas
+                            Sesi Mengajar Hari {{ $hari->label() }} — Pilih Kelas
                         </h3>
                         <p class="text-xs text-slate-500 mt-0.5">
                             Klik kartu sesi kelas yang ingin Anda catat agendanya. Pengisian dilakukan per kelas sesuai jadwal.
                         </p>
                     </div>
                 </div>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 border border-slate-200 shadow-sm">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1 text-xs font-bold text-slate-700 border border-slate-200 shadow-xs">
                     <span class="h-2 w-2 rounded-full bg-primary"></span>
                     <span>{{ $sesiList->count() }} Sesi Terjadwal ({{ $jadwals->count() }} JP)</span>
                 </span>
@@ -282,15 +362,15 @@
 
                 {{-- Improvisasi Pintar: Pengingat Pertemuan Sebelumnya --}}
                 @if ($agendaSebelumnya)
-                    <div class="mb-5 rounded-2xl border border-sky-100 bg-sky-50/60 p-4 text-xs text-slate-700">
+                    <div class="mb-5 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4 text-xs text-slate-700">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
-                            <span class="inline-flex items-center gap-1.5 font-bold text-sky-950 uppercase tracking-wider text-[11px]">
-                                <x-heroicon-o-light-bulb class="h-4 w-4 text-sky-600"/>
+                            <span class="inline-flex items-center gap-1.5 font-extrabold text-indigo-950 uppercase tracking-wider text-[11px]">
+                                <x-heroicon-o-light-bulb class="h-4 w-4 text-primary"/>
                                 Materi Pertemuan Sebelumnya (Pertemuan ke-{{ $agendaSebelumnya->pertemuan_ke }}, {{ Tanggal::lengkap($agendaSebelumnya->tanggal) }}):
                             </span>
                             <button type="button"
                                     onclick="document.getElementById('judul_materi').value = {{ Js::from($agendaSebelumnya->judul_materi) }}; document.getElementById('judul_materi').focus();"
-                                    class="font-bold text-sky-700 hover:text-sky-900 hover:underline">
+                                    class="inline-flex items-center gap-1 rounded-lg bg-white px-2.5 py-1 font-bold text-primary shadow-2xs ring-1 ring-indigo-200 hover:bg-indigo-50 transition">
                                 Gunakan Judul Ini →
                             </button>
                         </div>
@@ -318,15 +398,15 @@
                     <input type="hidden" name="jadwal_id" value="{{ $sesiAktif->primary_schedule_id }}">
                     <input type="hidden" name="lanjut_presensi" id="inputLanjutPresensi" value="1">
 
-                    <div class="grid gap-4 md:grid-cols-2">
+                    <div class="grid gap-5 md:grid-cols-2">
                         {{-- Judul Materi --}}
                         <x-bidang label="Judul Materi / Topik Pembelajaran" nama="judul_materi" :wajib="true">
                             <input type="text" id="judul_materi" name="judul_materi"
-                                   list="datalist-bab-tp"
+                                    list="datalist-bab-tp"
                                    value="{{ old('judul_materi', $sudah?->judul_materi) }}"
                                    placeholder="mis. Menulis Teks Editorial"
                                    required
-                                   class="block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                   class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
                             <datalist id="datalist-bab-tp">
                                 @foreach ($babs as $bab)
                                     <option value="{{ $bab->judul }}"></option>
@@ -335,12 +415,25 @@
                                     @endforeach
                                 @endforeach
                             </datalist>
+
+                            @if ($babs->isNotEmpty())
+                                <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pilih Cepat Bab:</span>
+                                    @foreach ($babs->take(5) as $bab)
+                                        <button type="button"
+                                                onclick="document.getElementById('bab_id').value = '{{ $bab->id }}'; if(!document.getElementById('judul_materi').value) document.getElementById('judul_materi').value = {{ Js::from($bab->judul) }};"
+                                                class="rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600 hover:border-primary-300 hover:bg-primary-50 hover:text-primary transition">
+                                            {{ $bab->kode }}: {{ Str::limit($bab->judul, 24) }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @endif
                         </x-bidang>
 
                         {{-- Bab / Lingkup Materi --}}
                         <x-bidang label="Bab / Lingkup Materi" nama="bab_id">
                             <select id="bab_id" name="bab_id"
-                                    class="block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                    class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
                                 <option value="">— Tidak ditautkan / Pilih Bab —</option>
                                 @foreach ($babs as $bab)
                                     <option value="{{ $bab->id }}" @selected(($sudah?->bab_id ?? old('bab_id')) === $bab->id)>
@@ -350,13 +443,13 @@
                             </select>
                         </x-bidang>
 
-                        {{-- Metode Pembelajaran --}}
+                        {{-- Metode Pembelajaran + Quick Fill Chips --}}
                         <x-bidang label="Metode Pembelajaran" nama="metode">
                             <input type="text" id="metode" name="metode"
                                    list="datalist-metode"
                                    value="{{ old('metode', $sudah?->metode) }}"
                                    placeholder="mis. Diskusi kelompok, Praktik, dll."
-                                   class="block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                   class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
                             <datalist id="datalist-metode">
                                 <option value="Ceramah interaktif"></option>
                                 <option value="Diskusi kelompok & presentasi"></option>
@@ -366,12 +459,22 @@
                                 <option value="Penugasan mandiri & latihan soal"></option>
                                 <option value="Tanya jawab & refleksi"></option>
                             </datalist>
+                            <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Klik Cepat:</span>
+                                @foreach (['Ceramah Interaktif', 'Diskusi Kelompok', 'Praktik / Demonstrasi', 'PBL', 'PjBL', 'Latihan Soal & Kuis'] as $chipMetode)
+                                    <button type="button"
+                                            onclick="document.getElementById('metode').value = '{{ $chipMetode }}'"
+                                            class="rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-600 hover:border-primary-300 hover:bg-primary-50 hover:text-primary transition">
+                                        + {{ $chipMetode }}
+                                    </button>
+                                @endforeach
+                            </div>
                         </x-bidang>
 
                         {{-- Status Pertemuan --}}
                         <x-bidang label="Status Pertemuan" nama="status" :wajib="true">
                             <select id="status" name="status" required
-                                    class="block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                    class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">
                                 @foreach ($statusList as $nilai => $label)
                                     <option value="{{ $nilai }}"
                                         @selected(($sudah?->status?->value ?? old('status', 'terlaksana')) === $nilai)>
@@ -385,7 +488,7 @@
                         <x-bidang label="Uraian Kegiatan Pembelajaran" nama="uraian_kegiatan" class="md:col-span-2">
                             <textarea id="uraian_kegiatan" name="uraian_kegiatan" rows="3"
                                       placeholder="Ringkasan kegiatan pembelajaran, materi inti yang dibahas, atau catatan khusus kelas ini"
-                                      class="block w-full rounded-xl border-slate-300 text-sm shadow-sm focus:border-primary focus:ring-primary">{{ old('uraian_kegiatan', $sudah?->uraian_kegiatan) }}</textarea>
+                                      class="block w-full rounded-xl border-slate-200 text-sm shadow-xs focus:border-primary focus:ring-primary">{{ old('uraian_kegiatan', $sudah?->uraian_kegiatan) }}</textarea>
                         </x-bidang>
                     </div>
 
@@ -406,14 +509,14 @@
 
                             <button type="submit"
                                     onclick="document.getElementById('inputLanjutPresensi').value = '0'"
-                                    class="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition">
+                                    class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-xs hover:bg-slate-50 transition">
                                 <x-heroicon-o-check class="h-4 w-4 text-slate-500"/>
                                 Simpan Agenda Saja
                             </button>
 
                             <button type="submit"
                                     onclick="document.getElementById('inputLanjutPresensi').value = '1'"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-accent-600 transition">
+                                    class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-accent to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm shadow-accent/25 hover:from-accent-600 hover:to-teal-600 transition">
                                 <x-heroicon-o-arrow-right-circle class="h-5 w-5"/>
                                 Simpan & Lanjut Presensi
                             </button>
